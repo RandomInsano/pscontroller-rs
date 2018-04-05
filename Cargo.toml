@@ -1,0 +1,14 @@
+[package]
+name = "pscontroller-rs"
+version = "0.1.0"
+authors = ["edwinamsler"]
+
+[dependencies]
+#embedded-hal = "0.1.2"
+# For some reason, this avoids needing to re-compile every cycle
+embedded-hal = { path = "../embedded-hal" }
+#linux-embedded-hal = "0.1.1"
+linux-embedded-hal = { path = "../linux-embedded-hal" }
+spidev = "0.3.0"
+bit_reverse = "0.1.7"
+
