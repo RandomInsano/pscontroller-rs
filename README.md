@@ -19,11 +19,11 @@ Lots of documentation on these guys (check the bibliography) and should be strai
 
 ### DVD Remote Reciever (SCPH-10160)
 
-This seems to need an initialization sequence as it won't report anything other than its usual device id (0x41) when first plugged in. I'll have to hack my PS2 and sniff the bus for this one.
+This seems to need an initialization sequence as it won't report anything other than its usual device id (0x41) when first plugged in, no matter how much I mash the buttons. I'll have to hack my PS2 and sniff the bus for this one.
 
 ### Multitaps for PSX (SCPH-1070) and PS2 (SCPH-10090 and SCPH-70120)
 
-I don't own either of these, so they're at the bottom of the list. I'm assuming it's just a special multiplexer, but I'll have to find one to fiture it out.
+I don't own either of these, so they're at the bottom of the list. I'm assuming it's just a special multiplexer, but I'll have to find one to figure it out.
 
 Bibliography
 ---------------
