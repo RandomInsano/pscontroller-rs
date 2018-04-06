@@ -31,6 +31,10 @@ fn main() {
 	command[1] = 0x42;
 	command[2] = 0x00;
 
+	for item in command.iter_mut() {
+		*item = item.swap_bits();
+	}
+
 	let mut now = time::Instant::now();
 	let sleep_duration = time::Duration::from_micros(0);
 	let sample_duration = time::Duration::from_secs(1);
@@ -40,10 +44,6 @@ fn main() {
 
 	loop {
 		thread::sleep(sleep_duration);	
-
-		for item in command.iter_mut() {
-			*item = item.swap_bits();
-		}
 
 		{
 			let mut transfer = SpidevTransfer::read_write(&command, &mut buffer);
