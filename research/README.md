@@ -4,7 +4,7 @@ Hacking Notes
 Device types
 -------------
 
-Richard Davies who created the [PSX Peripheral Bus Library]http://www.debaser.force9.co.uk/psxcn/ over 20 years ago did a fantastic job catalogging controllers from the pre-PS2 era. I'm picking up this torch to fill in the rest, so feel free to reach out if you have some really weird controller device you want to lend me via the powers of UPS or FedEx.
+Richard Davies who created the [PSX Peripheral Bus Library](http://www.debaser.force9.co.uk/psxcn/) over 20 years ago did a fantastic job catalogging controllers from the pre-PS2 era. I'm picking up this torch to fill in the rest, so feel free to reach out if you have some really weird controller device you want to lend me via the powers of UPS or FedEx.
 
 | Device | JPN P/N    | EU/NA P/N  | Friendly Name    |
 | ------ | ---------- | ---------- | -----------------|
