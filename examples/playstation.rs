@@ -38,6 +38,13 @@ fn main() {
                     x.buttons.start(),
                     x.rx,
                     x.ry);
+            },
+            Device::DualShock2(x) => {
+                println!("Start? {0} - R:{1:02x},{2:02x} - X Pressure:{3:02x}", 
+                    x.buttons.start(),
+                    x.rx,
+                    x.ry,
+                    x.pressures[6]);
             },            
             _ => println!("Unimplemented"),
         }

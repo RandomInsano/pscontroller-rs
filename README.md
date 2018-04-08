@@ -5,7 +5,7 @@ The primary goal here is to support the DualShock 1/2 controllers as they're the
 
 * [x] Original PlayStation digital mode
 * [x] DualShock 1/2 analog sticks
-* [ ] DualShock pressure sensitive buttons
+* [x] DualShock pressure sensitive buttons
 * [ ] Dual Analog
 * [ ] DVD Remote
 * [ ] Multitaps

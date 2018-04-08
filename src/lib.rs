@@ -35,15 +35,17 @@ const CONTROLLER_NOT_PRESENT: u8 = 0xff;
 const CONTROLLER_CLASSIC: u8 = 0xc1;
 /// DualShock in Digital mode
 const CONTROLLER_DUALSHOCK_DIGITAL: u8 = 0x41;
-/// DualShock 1/2
+/// DualShock
 const CONTROLLER_DUALSHOCK_ANALOG: u8 = 0x73;
+/// DuakShock 2
+const CONTROLLER_DUALSHOCK_PRESSURE: u8 = 0x79;
 
 /// Command to poll buttons
 const CMD_POLL: &[u8] = &[0x01, 0x42, 0x00];
 
 #[repr(C)]
 union ControllerData {
-    data: [u8; 6],
+    data: [u8; 18],
     classic: Classic,
     ds: DualShock,
     ds2: DualShock2,
@@ -143,16 +145,16 @@ impl GamepadButtons {
 
 #[repr(C)]
 pub struct DualShock2 {
-    buttons: GamepadButtons,
+    pub buttons: GamepadButtons,
 
-    rx: u8,
-    ry: u8,
-    lx: u8,
-    ly: u8,
+    pub rx: u8,
+    pub ry: u8,
+    pub lx: u8,
+    pub ly: u8,
 
     /// List of possible pressure readings from the buttons
     /// Note that these are configurable length
-    pressures: [u8; 8],
+    pub pressures: [u8; 8],
 }
 
 #[repr(C)]
@@ -221,11 +223,11 @@ where
     // TODO: Return error types
     pub fn read_buttons(&mut self) -> Device {
         let mut buffer = [0u8; 21];
-        let mut data = [0u8; 6];
+        let mut data = [0u8; 18];
         Self::byte_copy(CMD_POLL, &mut buffer);
         self.send_command(&mut buffer);
 
-        data.copy_from_slice(&buffer[3 .. 9]);
+        data.copy_from_slice(&buffer[3 .. 21]);
 
         let controller = ControllerData { data: data };
 
@@ -235,6 +237,7 @@ where
                 CONTROLLER_CLASSIC => Device::Classic(controller.classic),
                 CONTROLLER_DUALSHOCK_DIGITAL => Device::Classic(controller.classic),                
                 CONTROLLER_DUALSHOCK_ANALOG => Device::DualShock(controller.ds),
+                CONTROLLER_DUALSHOCK_PRESSURE => Device::DualShock2(controller.ds2),
                 _ => Device::Unknown,
             }
         }
