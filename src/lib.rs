@@ -29,6 +29,7 @@ const PS_CIRCLE: u16 = 0x2000;
 const PS_CROSS: u16 = 0x4000;
 const PS_SQUARE: u16 = 0x8000;
 
+
 /// Controller missing
 const CONTROLLER_NOT_PRESENT: u8 = 0xff;
 /// Original controller, SCPH-1080
@@ -202,16 +203,6 @@ where
 	    }
     }
 
-    // Needed because `copy_from_slice` doesn't work on different
-    // sized arrays for some silly reason
-    fn byte_copy(from: &[u8], to: &mut [u8]) {
-        assert!(from.len() <= to.len());
-
-        for i in 0 .. from.len() {
-            to[i] = from[i];
-        }
-    }
-
     pub fn send_command(&mut self, command: &mut [u8]) -> Result<(), E> {
         Self::flip(command);
         self.dev.transfer(command)?;
@@ -224,9 +215,9 @@ where
     pub fn read_buttons(&mut self) -> Device {
         let mut buffer = [0u8; 21];
         let mut data = [0u8; 18];
-        Self::byte_copy(CMD_POLL, &mut buffer);
-        self.send_command(&mut buffer);
 
+        data[0 .. CMD_POLL.len()].copy_from_slice(CMD_POLL);
+        self.send_command(&mut buffer);
         data.copy_from_slice(&buffer[3 .. 21]);
 
         let controller = ControllerData { data: data };
