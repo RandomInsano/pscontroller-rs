@@ -3,8 +3,8 @@ PlayStation Controller (PAD) Driver for Rust Embedded
 
 The primary goal here is to support the DualShock 1/2 controllers as they're the most prevelent, but there are other fun control devices to try. Currently supported:
 
-* [ ] Original PlayStation digital mode
-* [ ] DualShock 1/2 analog sticks
+* [x] Original PlayStation digital mode
+* [x] DualShock 1/2 analog sticks
 * [ ] DualShock pressure sensitive buttons
 * [ ] Dual Analog
 * [ ] DVD Remote
@@ -12,10 +12,21 @@ The primary goal here is to support the DualShock 1/2 controllers as they're the
 
 Notes for hacking status of of these below.
 
+### Controller (SCPH-1080)
+
+Original controller without analog sticks.
+
+Identifier: 0xC1
+
+This one responds with "ff c1 da" when polled. 
 
 ### DualShock (SCPH-1200) and DualShock 2 (SCPH-10010)
 
 Lots of documentation on these guys (check the bibliography) and should be straightforward to support.
+
+Identifier 0x41
+
+Responds to polling with "ff 41 5a"
 
 ### DVD Remote Reciever (SCPH-10160)
 

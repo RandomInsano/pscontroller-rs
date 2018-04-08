@@ -6,7 +6,7 @@ use std::io;
 use linux_hal::Spidev;
 use linux_hal::spidev::{SpidevOptions, SPI_MODE_3};
 
-use pscontroller_rs::PlayStationPort;
+use pscontroller_rs::{PlayStationPort, Device};
 
 fn build_spi() -> io::Result<Spidev> {
 	let mut spi = Spidev::open("/dev/spidev32766.0")?;
@@ -25,7 +25,21 @@ fn main() {
 	let mut psp = PlayStationPort::new(spi);
 
     loop {
-        let buttons = psp.read_buttons();
-        println!("Start? {}", buttons.start());
+        let controller = psp.read_buttons();
+
+        match controller {
+            Device::None => println!("Missing"),
+            Device::Classic(x) => {
+                println!("Start? {0}", 
+                    x.buttons.start());
+            },
+            Device::DualShock(x) => {
+                println!("Start? {0} - R:{1:02x},{2:02x}", 
+                    x.buttons.start(),
+                    x.rx,
+                    x.ry);
+            },            
+            _ => println!("Unimplemented"),
+        }
     }
 }
