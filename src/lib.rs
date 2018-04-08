@@ -244,15 +244,10 @@ where
         Self::dump_hex(&buffer);
 
         self.send_command(CMD_ENTER_ESCAPE_MODE, &mut buffer)?;
-        Self::dump_hex(&buffer);
         self.send_command(CMD_SET_MODE, &mut buffer)?;
-        Self::dump_hex(&buffer);
         self.send_command(CMD_INIT_PRESSURE, &mut buffer)?;
-        Self::dump_hex(&buffer);
         self.send_command(CMD_RESPONSE_FORMAT, &mut buffer)?;
-        Self::dump_hex(&buffer);
         self.send_command(CMD_EXIT_ESCAPE_MODE, &mut buffer)?;
-        Self::dump_hex(&buffer);
 
         Ok(())
     }
