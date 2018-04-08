@@ -21,8 +21,8 @@ fn build_spi() -> io::Result<Spidev> {
 }
 
 fn main() {
-	let spi = build_spi().unwrap();
-	let mut psp = PlayStationPort::new(spi);
+    let spi = build_spi().unwrap();
+    let mut psp = PlayStationPort::new(spi);
 
     psp.enable_pressure();
 
