@@ -14,19 +14,26 @@ Richard Davies who created the [PSX Peripheral Bus Library]http://www.debaser.fo
 |        | SLPH-0015  |            | Volume Controller (untested); Rotation = Twist, A = Start, B = A |
 |        |            | SLEH-0005  | MadKatz Steering Wheel (twitchy) |
 | 3      |            |            | Konami Lightgun (untested) |
-| 4      | SCPH-1010  | SCPH 1080  | E Controller |
+| 4      | SCPH-1010  | SCPH 1080  | Controller |
 |        | SCPH-1110  |            | Analog Joystick - Digital Mode |
-|        |            | SCPH-1180  | E Analog Controller - Digital Mode |
-|        | SCPH-1150  | SCPH-1200  | E Dual Shock Analog Controller - Digital Mode |
+|        |            | SCPH-1180  | Analog Controller - Digital Mode |
+|        | SCPH-1150  | SCPH-1200  | Dual Shock Analog Controller - Digital Mode |
 |        |            | SLEH-0011  | Ascii Resident Evil Pad |
 |        |            | SLEH-0004  | Namco Arcade Stick (untested) |
+|        |            | SCPH-10160 | PlayStation 2 DVD Remote (default) |
 | 5      | SCPH-1110  |            | Analog Joystick - Analog Mode (untested) |
-|        |            | SCPH-1180  | E Analog Controller - Analog Green Mode |
+|        |            | SCPH-1180  | Analog Controller - Analog Green Mode |
 | 6      |            | SLEH-0007  | Namco G-con45 |
-| 7      | SCPH-1150  | SCPH-1200  | E Dual Shock Analog Controller - Analog Red Mode |
-|        |            | SCPH-1180  | E Analog Controller - Analog Red Mode |
+| 7      | SCPH-1150  | SCPH-1200  | Dual Shock Analog Controller - Analog Red Mode |
+|        |            | SCPH-1180  | Analog Controller - Analog Red Mode |
 | 14     |            | SLEH-0020  | Namco Jogcon |
 | ??     |            | SCPH-10160 | PlayStation 2 DVD Remote |
+| 12     | N/A        | N/A        | This may be a reserved error state |
+
+Notes:
+* Devices can have different operating modes and will report differently depending on the mode.
+* The device ID is purposely not repeated for readability.
+* Removed the "E" designation from the list official controllers. My guess is that different regions have different letters.
 
 Deep dives into particular devices
 -----------------------------------
@@ -37,7 +44,7 @@ Original controller without analog sticks.
 
 Identifier: 0xC1
 
-This one responds with "ff c1 da" when polled. 
+This one responds with "ff c1 da" when polled. This doesn't seem normal at all and when issuing bad commands while in escape mode, the response is 0xc1 no matter which controller I use. Also, the left and square buttons don't seem to work so it makes sense that it may be in an error state.
 
 ### DualShock (SCPH-1200) and DualShock 2 (SCPH-10010)
 
