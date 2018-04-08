@@ -29,6 +29,9 @@ const PS_CIRCLE: u16 = 0x2000;
 const PS_CROSS: u16 = 0x4000;
 const PS_SQUARE: u16 = 0x8000;
 
+/// The maximum length of a message from a controller
+const MESSGE_MAX_LENGTH: usize = 32;
+
 
 /// Controller missing
 const CONTROLLER_NOT_PRESENT: u8 = 0xff;
@@ -43,6 +46,17 @@ const CONTROLLER_DUALSHOCK_PRESSURE: u8 = 0x79;
 
 /// Command to poll buttons
 const CMD_POLL: &[u8] = &[0x01, 0x42, 0x00];
+/// Command to enter escape mode
+const CMD_ENTER_ESCAPE_MODE: &[u8] = &[0x01, 0x43, 0x00, 0x01, 0x00];
+/// Command to exit escape mode
+const CMD_EXIT_ESCAPE_MODE: &[u8] = &[0x01, 0x43, 0x00, 0x00, 0x00];
+/// Command to set response format. Right now asks for all data
+const CMD_RESPONSE_FORMAT: &[u8] = &[0x01, 0x4F, 0x00, 0xFF, 0xFF, 0x03, 0x00, 0x00, 0x00];
+/// Command to initialize / customize pressure
+const CMD_INIT_PRESSURE: &[u8] = &[0x01, 0x40, 0x00, 0x00, 0x02, 0x00, 0x00, 0x00, 0x00];
+/// Command to set major mode (DualShock = 1 / Digital = 0)
+const CMD_SET_MODE: &[u8] = &[0x01, 0x44, 0x00, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00];
+
 
 #[repr(C)]
 union ControllerData {
@@ -203,21 +217,52 @@ where
 	    }
     }
 
-    pub fn send_command(&mut self, command: &mut [u8]) -> Result<(), E> {
-        Self::flip(command);
-        self.dev.transfer(command)?;
-        Self::flip(command);
+    pub fn send_command(&mut self, command: &[u8], result: &mut [u8]) -> Result<(), E> {
+        result[0 .. command.len()].copy_from_slice(command);
+
+        Self::flip(result);
+        self.dev.transfer(result)?;
+        Self::flip(result);
+
+        Ok(())
+    }
+
+    fn dump_hex(buffer: &[u8]) {
+        for byte in buffer.iter() {
+            print!("{:02x} ", byte);
+        }
+        println!();
+    }
+
+    // TODO: Redefine this to be more inline with the actual report. Right now all the parameters are hard coded
+    // TODO: Detect and return actual protocol errors
+    pub fn enable_pressure(&mut self) -> Result<(), E> {
+        let mut buffer = [0u8; MESSGE_MAX_LENGTH];
+
+        // Wake up the controller if needed
+        self.send_command(CMD_POLL, &mut buffer)?;
+        Self::dump_hex(&buffer);
+
+        self.send_command(CMD_ENTER_ESCAPE_MODE, &mut buffer)?;
+        Self::dump_hex(&buffer);
+        self.send_command(CMD_SET_MODE, &mut buffer)?;
+        Self::dump_hex(&buffer);
+        self.send_command(CMD_INIT_PRESSURE, &mut buffer)?;
+        Self::dump_hex(&buffer);
+        self.send_command(CMD_RESPONSE_FORMAT, &mut buffer)?;
+        Self::dump_hex(&buffer);
+        self.send_command(CMD_EXIT_ESCAPE_MODE, &mut buffer)?;
+        Self::dump_hex(&buffer);
 
         Ok(())
     }
 
     // TODO: Return error types
     pub fn read_buttons(&mut self) -> Device {
-        let mut buffer = [0u8; 21];
+        let mut buffer = [0u8; MESSGE_MAX_LENGTH];
         let mut data = [0u8; 18];
 
-        data[0 .. CMD_POLL.len()].copy_from_slice(CMD_POLL);
-        self.send_command(&mut buffer);
+        self.send_command(CMD_POLL, &mut buffer);
         data.copy_from_slice(&buffer[3 .. 21]);
 
         let controller = ControllerData { data: data };
