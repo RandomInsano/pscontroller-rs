@@ -5,7 +5,6 @@ authors = ["Edwin Amsler"]
 
 categories = ["embedded", "hardware-support", "no-std"]
 description = "A hardware-level platform agnostic driver for PlayStation 1 or 2 contoller peripherals. Requires soldering. 😁"
-documentation = ""
 keywords = ["embedded-hal-driver", "playstation", "gamepad"]
 license = "MIT OR Apache-2.0"
 repository = "https://github.com/RandomInsano/pscontroller-rs"
