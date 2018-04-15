@@ -36,7 +36,7 @@ fn main() {
 	}
 
 	let mut now = time::Instant::now();
-	let sleep_duration = time::Duration::from_micros(0);
+	let sleep_duration = time::Duration::from_micros(30_000);
 	let sample_duration = time::Duration::from_secs(1);
 	let mut count = 0;
 	let mut failure = 0;

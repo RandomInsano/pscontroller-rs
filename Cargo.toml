@@ -1,13 +1,24 @@
 [package]
 name = "pscontroller-rs"
 version = "0.1.0"
-authors = ["edwinamsler"]
+authors = ["Edwin Amsler"]
+
+categories = ["embedded", "hardware-support", "no-std"]
+description = "A hardware-level platform agnostic driver for PlayStation 1 or 2 contoller peripherals. Requires soldering. 😁"
+documentation = ""
+keywords = ["embedded-hal-driver", "playstation", "gamepad"]
+license = "MIT OR Apache-2.0"
+repository = "https://github.com/RandomInsano/pscontroller-rs"
+
+exclude = [
+    "research/*",
+]
 
 [dependencies]
 embedded-hal = "0.1.2"
-#linux-embedded-hal = "0.1.1"
-linux-embedded-hal = { path = "../linux-embedded-hal" }
 spidev = "0.3.0"
 bit_reverse = "0.1.7"
 bitflags = "1.0"
 
+[dev-dependencies]
+linux-embedded-hal = "0.1.1"
