@@ -43,15 +43,37 @@ Deep dives into particular devices
 
 Original controller without analog sticks.
 
-Identifier: 0xC1
+Identifier: 0xC
 
 This one responds with "ff c1 da" when polled. This doesn't seem normal at all and when issuing bad commands while in escape mode, the response is 0xc1 no matter which controller I use. Also, the left and square buttons don't seem to work so it makes sense that it may be in an error state.
+
+### JogCon
+
+Namco's force-feedback handheld controller
+
+Identifier 0xE
+
+This pre-dates the analog controllers from Sony, but answers to the same commands as the DualShocks.
+
+The first 16 bits of the response are the usual buttons, followed by a signed 16bit number for the jog wheel's absolute position. The second last byte is the JogCon's current status:
+
+The first command byte when the motor is enabled (same as dual shock) seems to be broken into two nybbles. The first is the mode, and the second is how hard to drive the motor (0 - 127).
+
+0x1 = Turn clockwise
+0x2 = Turn counter clockwise
+0x3 = Hold at position
+
+```
+0x01 = Clockwise
+0x02 = Counter Clockwise
+0x04 = Max reached (either CW or CCW)
+```
 
 ### DualShock (SCPH-1200) and DualShock 2 (SCPH-10010)
 
 Lots of documentation on these guys (check the bibliography) and should be straightforward to support.
 
-Identifier 0x41
+Identifier 0x4
 
 Responds to polling with "ff 41 5a"
 
@@ -97,6 +119,17 @@ DVD Remote:
 
 
 ### Data Dumps:
+
+#### JogCon
+
+```
+Status:    01 02 01 01 01 00 
+Const 1.1: 00 04 03 01 1e 
+Const 1.2: 00 00 00 00 00 
+Const 2:   00 01 00 00 00 
+Const 3.1: 00 00 04 00 00 
+Const 3.2: 00 00 04 00 00 
+```
 
 #### PlayStation DualShock 1:
 
