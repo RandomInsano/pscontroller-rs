@@ -53,15 +53,17 @@ Namco's force-feedback handheld controller
 
 Identifier 0xE
 
-This pre-dates the analog controllers from Sony, but answers to the same commands as the DualShocks.
+This pre-dates the analog controllers from Sony, but answers to the same commands as the DualShocks. If you don't press any buttons on the controller for 60 seconds it will disable itself until a button is pressed again. Ridge Racer games call this "Safety Mode".
 
 The first 16 bits of the response are the usual buttons, followed by a signed 16bit number for the jog wheel's absolute position. The second last byte is the JogCon's current status:
 
-The first command byte when the motor is enabled (same as dual shock) seems to be broken into two nybbles. The first is the mode, and the second is how hard to drive the motor (0 - 127).
-
+```
 0x1 = Turn clockwise
 0x2 = Turn counter clockwise
 0x3 = Hold at position
+```
+
+The first command byte when the motor is enabled (same as dual shock) seems to be broken into two nybbles. The first is the mode, and the second is how hard to drive the motor (0 - 127).
 
 ```
 0x01 = Clockwise
