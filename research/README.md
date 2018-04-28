@@ -27,6 +27,7 @@ Richard Davies who created the [PSX Peripheral Bus Library](http://www.debaser.f
 | 7      | SCPH-1150  | SCPH-1200  | Dual Shock Analog Controller - Analog Red Mode |
 |        |            | SCPH-1180  | Analog Controller - Analog Red Mode |
 |        |            | N/A        | RedOctane Guitar Hero Controller |
+| 9      | SCPH-2000  | N/A        | [Keyboard / Mouse Adapter](http://www.psxdev.net/forum/viewtopic.php?f=54&t=140) |
 | 14     |            | SLEH-0020  | Namco Jogcon |
 | ??     |            | SCPH-10160 | PlayStation 2 DVD Remote |
 | 12     | N/A        | N/A        | This may be a reserved error state |
