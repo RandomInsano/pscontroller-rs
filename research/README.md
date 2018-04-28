@@ -56,20 +56,26 @@ Identifier 0xE
 
 This pre-dates the analog controllers from Sony, but answers to the same commands as the DualShocks. If you don't press any buttons on the controller for 60 seconds it will disable itself until a button is pressed again. Ridge Racer games call this "Safety Mode".
 
-The first 16 bits of the response are the usual buttons, followed by a signed 16bit number for the jog wheel's absolute position. The second last byte is the JogCon's current status:
+#### Polling response data
 
-```
-0x1 = Turn clockwise
-0x2 = Turn counter clockwise
-0x3 = Hold at position
-```
-
-The first command byte when the motor is enabled (same as dual shock) seems to be broken into two nybbles. The first is the mode, and the second is how hard to drive the motor (0 - 127).
+The polling response is 3*16 bits long. The first 16 bits of the response are the usual buttons, followed by a signed 16bit number for the jog wheel's absolute position. The second last byte is the JogCon's current status while the last byte is always zero. The six different control values I saw while playing one lap in Ridge Racer V where:
 
 ```
 0x01 = Clockwise
 0x02 = Counter Clockwise
 0x04 = Max reached (either CW or CCW)
+0xC0 = Unkonwn, occurs once
+```
+
+The command byte when the motor is enabled (same as dual shock) seems to be broken into two nybbles. The first is the mode, and the second is how hard to drive the motor (0 - 127).
+
+```
+0x1 = Turn clockwise
+0x2 = Turn counter clockwise
+0x3 = Hold at position
+0x8 = Unknown, is followed by 0xff five times, occured 27 times, drive value 0
+0xB = Unknown, is followed by 0xff five times, occured once, drive value F
+0xC = Unknown, is followed by 0xff five times, occured once, drive value 0
 ```
 
 ### DualShock (SCPH-1200) and DualShock 2 (SCPH-10010)
