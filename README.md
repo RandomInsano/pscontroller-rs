@@ -8,9 +8,9 @@ The primary goal here is to support the DualShock 1/2 controllers as they're the
 * [x] DualShock 2 pressure sensitive buttons
 * [x] JogCon
 * [x] JogCon force feedback
+* [x] NegCon
 * [ ] DualShock rumble
 * [ ] Guitar Hero guitar
-* [ ] NegCon
 * [ ] Dual Analog
 * [ ] Multitaps
 * [x] ~~DVD Remote (doesn't follow spec)~~
