@@ -7,7 +7,7 @@ use linux_hal::Spidev;
 use linux_hal::spidev::{SpidevOptions, SPI_MODE_3};
 use linux_hal::Pin;
 
-use pscontroller_rs::{PlayStationPort, GamepadButtons, Device};
+use pscontroller_rs::{PlayStationPort, Device};
 
 // Specific to the host device used on Linux, you'll have to change the following
 // parameters depending on your board and also export and allow writing to the GPIO
@@ -36,7 +36,7 @@ fn dump_hex(buffer: &[u8]) {
 
 fn main() {
     let spi = build_spi().unwrap();
-    let mut psp = PlayStationPort::new(spi, None);
+    let mut psp = PlayStationPort::new(spi, None::<Pin>);
 
     psp.enable_pressure().unwrap();
 
@@ -99,6 +99,9 @@ fn main() {
             }
             Device::JogCon(x) => {
                 println!("Buttons: {0:08b}, Wheel: {1}", x.buttons.bits(), x.jog_position)
+            }
+            Device::NegCon(x) => {
+                println!("Buttons: {0:08b}, Twist: {1}, I:  {2}", x.buttons.bits(), x.twist, x.switchi)
             }
             Device::ConfigurationMode => {
                 println!("Somehow we got stuck where we shouldn't be");

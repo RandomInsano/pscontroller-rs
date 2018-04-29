@@ -40,7 +40,7 @@ fn build_spi() -> io::Result<Spidev> {
 
 fn main() {
     let spi = build_spi().unwrap();
-    let mut psp = PlayStationPort::new(spi, None);
+    let mut psp = PlayStationPort::new(spi, None::<Pin>);
 
 	let sleep_duration = time::Duration::from_micros(10_000);
 	let control_duration = time::Duration::from_secs(3);

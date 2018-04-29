@@ -28,7 +28,7 @@
 #![feature(untagged_unions)]
 #![no_std]
 #![deny(missing_docs)]
-//#![deny(warnings)]
+#![deny(warnings)]
 #![feature(unsize)]
 
 extern crate bit_reverse;
@@ -42,7 +42,7 @@ use hal::digital::OutputPin;
 /// The maximum length of a message from a controller
 const MESSAGE_MAX_LENGTH: usize = 32;
 /// Acknoweldgement byte for header commnad
-const ACK_BYTE: u8 = 0x5a;
+//const ACK_BYTE: u8 = 0x5a;
 /// Length of the command header
 const HEADER_LEN: usize = 3;
 
@@ -58,6 +58,8 @@ const CONTROLLER_DUALSHOCK_ANALOG: u8 = 0x73;
 const CONTROLLER_DUALSHOCK_PRESSURE: u8 = 0x79;
 /// JogCon
 const CONTROLLER_JOGCON: u8 = 0xe3;
+/// NegCon
+const CONTROLLER_NEGCON: u8 = 0x23;
 /// Configuration Mode
 const CONTROLLER_CONFIGURATION: u8 = 0xf3;
 
@@ -99,6 +101,7 @@ union ControllerData {
     ds2: DualShock2,
     gh: GuitarHero,
     jc: JogCon,
+    nc: NegCon,
 }
 
 /// What we want the JogCon's wheel to do after we
@@ -136,6 +139,14 @@ pub enum JogState {
 pub struct GamepadButtons {
     data: u16,
 }
+
+/// The digital buttons of the Namco NegCon
+#[repr(C)]
+#[derive(Clone)]
+pub struct NegconButtons {
+    data: u16,
+}
+
 
 /// Errors that can arrise from trying to communicate with the controller
 pub enum Error<E> {
@@ -269,7 +280,75 @@ impl GamepadButtons {
     }
 
     /// The raw value of the buttons on the controller. Useful for
-    /// aggregate funcitons
+    /// aggregate functions
+    pub fn bits(&self) -> u16 {
+        self.data
+    }
+}
+
+/// The NegCon's version of `GamepadButtons`
+impl NegconButtons {
+    // Gamepad buttons are active low, so that's why we're comparing them to zero
+
+    const NC_SELECT: u16 = 0x0001;
+    const NC_START: u16 = 0x0008;
+    const NC_UP: u16 = 0x0010;
+    const NC_RIGHT: u16 = 0x0020;
+    const NC_DOWN: u16 = 0x0040;
+    const NC_LEFT: u16 = 0x0080;
+
+    const NC_R: u16 = 0x0800;
+    const NC_B: u16 = 0x1000;
+    const NC_A: u16 = 0x2000;
+
+
+    /// A button on the controller
+    pub fn select(&self) -> bool {
+        self.data & Self::NC_SELECT == 0
+    }
+
+    /// A button on the controller
+    pub fn start(&self) -> bool {
+        self.data & Self::NC_START == 0
+    }
+
+    /// A button on the controller
+    pub fn up(&self) -> bool {
+        self.data & Self::NC_UP == 0
+    }
+
+    /// A button on the controller
+    pub fn right(&self) -> bool {
+        self.data & Self::NC_RIGHT == 0
+    }
+
+    /// A button on the controller
+    pub fn down(&self) -> bool {
+        self.data & Self::NC_DOWN == 0
+    }
+
+    /// A button on the controller
+    pub fn left(&self) -> bool {
+        self.data & Self::NC_LEFT == 0
+    }
+
+    /// A button on the controller
+    pub fn r(&self) -> bool {
+        self.data & Self::NC_R == 0
+    }
+
+    /// A button on the controller
+    pub fn b(&self) -> bool {
+        self.data & Self::NC_B == 0
+    }
+
+    /// A button on the controller
+    pub fn a(&self) -> bool {
+        self.data & Self::NC_A == 0
+    }
+
+    /// The raw value of the buttons on the controller. Useful for
+    /// aggregate functions
     pub fn bits(&self) -> u16 {
         self.data
     }
@@ -341,7 +420,26 @@ impl HasStandardButtons for DualShock {
 }
 
 #[repr(C)]
-/// Represents the JogCon controller
+/// Represents the Namco NegCon controller
+pub struct NegCon {
+    /// The NegCon's weird buttons (A, B, R, etc)
+    pub buttons: NegconButtons,
+
+    /// The position of the twist (center = 0x80)
+    pub twist: u8,
+
+    /// Position of switch I
+    pub switchi: u8,
+
+    /// Position of switch II
+    pub switchii: u8,
+
+    /// Position of switch L
+    pub switchl: u8
+}
+
+#[repr(C)]
+/// Represents the Namco JogCon controller
 pub struct JogCon {
     // TODO: Implement an endian-safe accessor for jog_position
     // TODO: Implement an enum accessor for jog_state
@@ -420,6 +518,8 @@ pub enum Device {
     GuitarHero(GuitarHero),
     /// The Namco JonCon
     JogCon(JogCon),
+    /// The Namco NegCon
+    NegCon(NegCon),
 }
 
 /// The main event! Create a port using an SPI bus and start commanding
@@ -437,7 +537,7 @@ where
     /// Create a new device to talk over the PlayStation's controller
     /// port
     pub fn new(spi: SPI, mut select: Option<CS>) -> Self {
-        if let Some(x) = select {
+        if let Some(ref mut x) = select {
             x.set_high(); // Disable controller for now
         }
 
@@ -461,13 +561,13 @@ where
         // the bits ourselves
         Self::flip(result);
 
-        if let Some(x) = self.select {
+        if let Some(ref mut x) = self.select {
             x.set_low();
         }
 
         self.dev.transfer(result)?;
 
-        if let Some(x) = self.select {
+        if let Some(ref mut x) = self.select {
             x.set_high();
         }
 
@@ -594,6 +694,7 @@ where
                 CONTROLLER_DUALSHOCK_ANALOG => Device::DualShock(controller.ds),
                 CONTROLLER_DUALSHOCK_PRESSURE => Device::DualShock2(controller.ds2),
                 CONTROLLER_JOGCON => Device::JogCon(controller.jc),
+                CONTROLLER_NEGCON => Device::NegCon(controller.nc),
                 _ => Device::Unknown,
             }
         }

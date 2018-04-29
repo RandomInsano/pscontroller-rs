@@ -35,7 +35,8 @@ fn build_spi() -> io::Result<Spidev> {
 fn main() {
     let spi = build_spi().unwrap();
     //let enable_pin = Pin::new(SPI_ENABLE_PIN);
-    let mut psp = PlayStationPort::new(spi, None);
+    //let mut psp = PlayStationPort::new(spi, Some(enable_pin));
+	let mut psp = PlayStationPort::new(spi, None::<Pin>);
 	let mut command = [0u8; 21];
 	let mut buffer = [0u8; 21];
 
