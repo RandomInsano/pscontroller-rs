@@ -7,13 +7,12 @@ use linux_hal::Spidev;
 use linux_hal::spidev::{SpidevOptions, SPI_MODE_3};
 use linux_hal::Pin;
 
-use pscontroller_rs::{PlayStationPort, Device};
+use pscontroller_rs::{PlayStationPort, GamepadButtons, Device};
 
 // Specific to the host device used on Linux, you'll have to change the following
 // parameters depending on your board and also export and allow writing to the GPIO
-const SPI_ENABLE_PIN: u64 = 1020; // XIO-7 on the NTC CHIP
-const SPI_DEVICE: &str = "/dev/spidev32766.0"; // Needs a device-tree overlay
-const SPI_SPEED: u32 = 50_000; // Due to a bug, 50KHz is the best the CHIP can do semi-reliably
+const SPI_DEVICE: &str = "/dev/spidev0.0";
+const SPI_SPEED: u32 = 10_000;
 
 // This will build the 
 fn build_spi() -> io::Result<Spidev> {
@@ -37,8 +36,7 @@ fn dump_hex(buffer: &[u8]) {
 
 fn main() {
     let spi = build_spi().unwrap();
-    let enable_pin = Pin::new(SPI_ENABLE_PIN);    
-    let mut psp = PlayStationPort::new(spi, enable_pin);
+    let mut psp = PlayStationPort::new(spi, None);
 
     psp.enable_pressure().unwrap();
 
@@ -58,31 +56,6 @@ fn main() {
     dump_hex(&config.const3a);
     print!("Const 3.2: ");
     dump_hex(&config.const3a);
-
-    println!("Press [start] in standard mode to start polling");
-    loop {
-        let controller = match psp.read_input() {
-            Err(_) => {
-                print!("\rError reading from port");
-                continue;
-            },
-            Ok(x) => x,
-        };
-
-        match controller {
-            Device::Classic(x) => {
-                if x.buttons.start() {
-                    break;
-                }
-            },
-            Device::DualShock2(x) => {
-                if x.buttons.start() {
-                    break;
-                }
-            }
-            _ => {}
-        }
-    }
 
     loop {
         let controller = match psp.read_input() {
@@ -123,6 +96,9 @@ fn main() {
             },
             Device::GuitarHero(x) => {
                 println!("Buttons: {0:08b}, Whammy: {1}", x.buttons, x.whammy)
+            }
+            Device::JogCon(x) => {
+                println!("Buttons: {0:08b}, Wheel: {1}", x.buttons.bits(), x.jog_position)
             }
             Device::ConfigurationMode => {
                 println!("Somehow we got stuck where we shouldn't be");

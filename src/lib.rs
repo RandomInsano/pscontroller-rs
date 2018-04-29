@@ -7,10 +7,10 @@
 //! ($28 Canadian for two as of this writing).
 //! 
 //! The current state of this library is such that it's fairly naïve to which controller
-//! is plugged in, and will make a guess based on the device type (1 - 15) and how many
-//! 16bit words are being returned. For those who know the protocol, this library
+//! is plugged in, and will make a guess based on the device type (1 - 15) and
+//! how many 16bit words are being returned. For those who know the protocol, this library
 //! reads the second byte from the poll command and wraps the response in a struct based
-//! only on that
+//! on that so it's lightweight on memory
 //! 
 //! Efficiencies can be made here, and things will likely improve, but the darn thing is
 //! useful now so let's start using it! If you find things to fix, please make an issue.
@@ -22,12 +22,13 @@
 //! controllers and two memory cards), they made the data out (MISO) pin open drain so you'll
 //! need to add your own resistor. In my testing with a voltage divider on a PlayStation 2,
 //! the value is around 220 - 500 ohms. I'm not sure if the controller jack assembly
-//! contains one of these yet, so double check with a multimeter before plugging anything in.
+//! contains one of these yet, so you should double check with a multimeter before plugging
+//! anything in.
 
 #![feature(untagged_unions)]
 #![no_std]
 #![deny(missing_docs)]
-#![deny(warnings)]
+//#![deny(warnings)]
 #![feature(unsize)]
 
 extern crate bit_reverse;
@@ -55,6 +56,8 @@ const CONTROLLER_DUALSHOCK_DIGITAL: u8 = 0x41;
 const CONTROLLER_DUALSHOCK_ANALOG: u8 = 0x73;
 /// DuakShock 2
 const CONTROLLER_DUALSHOCK_PRESSURE: u8 = 0x79;
+/// JogCon
+const CONTROLLER_JOGCON: u8 = 0xe3;
 /// Configuration Mode
 const CONTROLLER_CONFIGURATION: u8 = 0xf3;
 
@@ -82,7 +85,8 @@ const CMD_READ_CONST2: &[u8] = &[0x01, 0x47, 0x00, 0x00, 0x5a, 0x5a, 0x5a, 0x5a,
 const CMD_READ_CONST3A: &[u8] = &[0x01, 0x4C, 0x00, 0x00, 0x5a, 0x5a, 0x5a, 0x5a, 0x5a];
 /// Command to read constant 3 at address 01
 const CMD_READ_CONST3B: &[u8] = &[0x01, 0x4C, 0x00, 0x01, 0x5a, 0x5a, 0x5a, 0x5a, 0x5a];
-
+/// Command to enable JogCon motor
+const CMD_MOTOR_JOGCON: &[u8] = &[0x01, 0x4D, 0x00, 0x00, 0xff, 0xff, 0xff, 0xff, 0xff]; 
 
 #[repr(C)]
 /// The poll command returns a series of bytes. This union allows us to interact with
@@ -94,6 +98,36 @@ union ControllerData {
     ds: DualShock,
     ds2: DualShock2,
     gh: GuitarHero,
+    jc: JogCon,
+}
+
+/// What we want the JogCon's wheel to do after we
+/// poll it
+pub enum JogControl {
+    /// Stop the motor
+    Stop = 0x00,
+    /// Hold the wheel in position (and return it if it moves)
+    Hold = 0x30,
+    /// Start turning the wheel left
+    Left = 0x20,
+    /// Start turning the wheel right
+    Right = 0x10,
+    /// Unknown 1
+    Unknown1 = 0x80,
+    /// Unknown 2
+    Unknown2 = 0xb0,
+    /// Unknown 3
+    Unknown3 = 0xc0,
+}
+
+/// What state the JogCon's wheel was in last poll
+pub enum JogState {
+    /// The wheel was turned left
+    TurnedLeft,
+    /// The wheel was turned right
+    TurnedRight,
+    /// The wheel met its maximum recordable distance
+    AtMaximum
 }
 
 /// The digital buttons of the gamepad
@@ -261,7 +295,7 @@ pub struct ControllerConfiguration {
 #[repr(C)]
 /// Represents the DualShock 2 controller
 pub struct DualShock2 {
-    /// Standard buttons (Cross, Circle, L3, Start)
+    /// Standard buttons (Cross, Circle, L3, Start, etc)
     pub buttons: GamepadButtons,
 
     /// Right analog stick, left and right
@@ -287,7 +321,7 @@ impl HasStandardButtons for DualShock2 {
 #[repr(C)]
 /// Represents the DualShock 1 controller
 pub struct DualShock {
-    /// Standard buttons (Cross, Circle, L3, Start)
+    /// Standard buttons (Cross, Circle, L3, Start, etc)
     pub buttons: GamepadButtons,
 
     /// Right analog stick, left and right
@@ -301,6 +335,28 @@ pub struct DualShock {
 }
 
 impl HasStandardButtons for DualShock {
+    fn buttons(&self) -> GamepadButtons {
+        self.buttons.clone()
+    }
+}
+
+#[repr(C)]
+/// Represents the JogCon controller
+pub struct JogCon {
+    // TODO: Implement an endian-safe accessor for jog_position
+    // TODO: Implement an enum accessor for jog_state
+
+    /// Standard buttons (Cross, Circle, L3, Start, etc)
+    pub buttons: GamepadButtons,
+
+    /// The absolute position of the jog wheel
+    pub jog_position: i16,
+
+    /// What state is the jog wheel in
+    pub jog_state: u8,
+}
+
+impl HasStandardButtons for JogCon {
     fn buttons(&self) -> GamepadButtons {
         self.buttons.clone()
     }
@@ -362,13 +418,15 @@ pub enum Device {
     DualShock2(DualShock2),
     /// Controller that shipped with Guitar Hero
     GuitarHero(GuitarHero),
+    /// The Namco JonCon
+    JogCon(JogCon),
 }
 
 /// The main event! Create a port using an SPI bus and start commanding
 /// controllers!
 pub struct PlayStationPort<SPI, CS> {
     dev: SPI,
-    select: CS,
+    select: Option<CS>,
 }
 
 impl<E, SPI, CS> PlayStationPort<SPI, CS>
@@ -378,8 +436,10 @@ where
 
     /// Create a new device to talk over the PlayStation's controller
     /// port
-    pub fn new(spi: SPI, mut select: CS) -> Self {
-        select.set_high(); // Disable controller for now
+    pub fn new(spi: SPI, mut select: Option<CS>) -> Self {
+        if let Some(x) = select {
+            x.set_high(); // Disable controller for now
+        }
 
         Self {
             dev: spi,
@@ -400,11 +460,17 @@ where
         // Because not all hardware supports LSB mode for SPI, we flip
         // the bits ourselves
         Self::flip(result);
-        self.select.set_low();
+
+        if let Some(x) = self.select {
+            x.set_low();
+        }
 
         self.dev.transfer(result)?;
 
-        self.select.set_high();
+        if let Some(x) = self.select {
+            x.set_high();
+        }
+
         Self::flip(result);
 
         Ok(())
@@ -426,6 +492,53 @@ where
         self.send_command(CMD_INIT_PRESSURE, &mut buffer)?;
         self.send_command(CMD_RESPONSE_FORMAT, &mut buffer)?;
         self.send_command(CMD_EXIT_ESCAPE_MODE, &mut buffer)?;
+
+        Ok(())
+    }
+
+    /// Configure the JogCon for wheel control.
+    /// 
+    /// If no digital buttons are pressed in this mode for 60 seconds, the
+    /// JogCon will go to sleep until buttons are pressed. If no polling is
+    /// done for 10 seconds, it will drop out of this mode and revert to
+    /// the standard Controller mode
+    pub fn enable_jogcon(&mut self) -> Result<(), E> {
+        let mut buffer = [0u8; MESSAGE_MAX_LENGTH];
+
+        // Wake up the controller if needed
+        self.send_command(CMD_POLL, &mut buffer)?;
+
+        self.send_command(CMD_ENTER_ESCAPE_MODE, &mut buffer)?;
+        self.send_command(CMD_SET_MODE, &mut buffer)?;
+        self.send_command(CMD_MOTOR_JOGCON, &mut buffer)?;
+        self.send_command(CMD_EXIT_ESCAPE_MODE, &mut buffer)?;
+
+        Ok(())
+    }
+
+    /// Control the JogCon's jogwheel.
+    /// 
+    /// * `strength` - A value between 0 and 15. Any higher will wrap around.
+    pub fn control_jogcon(&mut self, control: JogControl, strength: u8) -> Result<(), E> {
+        let mut command = [0u8; MESSAGE_MAX_LENGTH];
+        let mut buffer = [0u8; MESSAGE_MAX_LENGTH];
+
+        let mut control: u8 = match control {
+            JogControl::Hold => JogControl::Hold as u8,
+            JogControl::Left => JogControl::Left as u8,
+            JogControl::Right => JogControl::Right as u8,
+            JogControl::Unknown1 => JogControl::Unknown1 as u8,
+            JogControl::Unknown2 => JogControl::Unknown2 as u8,
+            JogControl::Unknown3 => JogControl::Unknown3 as u8,
+            _ => JogControl::Stop as u8
+        };
+
+        control |= strength & 0x0f;
+
+        command[..CMD_POLL.len()].copy_from_slice(CMD_POLL);
+        command[3] = control;
+
+        self.send_command(&command, &mut buffer)?;
 
         Ok(())
     }
@@ -467,7 +580,7 @@ where
         let mut data = [0u8; MESSAGE_MAX_LENGTH];
 
         self.send_command(CMD_POLL, &mut buffer)?;
-        data.copy_from_slice(&buffer);
+        data[0 .. MESSAGE_MAX_LENGTH - 3].copy_from_slice(&buffer[3..]);
 
         let controller = ControllerData { data: data };
         let device;
@@ -480,12 +593,14 @@ where
                 CONTROLLER_DUALSHOCK_DIGITAL => Device::Classic(controller.classic),                
                 CONTROLLER_DUALSHOCK_ANALOG => Device::DualShock(controller.ds),
                 CONTROLLER_DUALSHOCK_PRESSURE => Device::DualShock2(controller.ds2),
+                CONTROLLER_JOGCON => Device::JogCon(controller.jc),
                 _ => Device::Unknown,
             }
         }
 
         // Device polling will return `ACK_BYTE` in the third byte if the command
         // was properly understood
+        /*
         match device {
             Device::None => {},
             _ => {
@@ -494,6 +609,7 @@ where
                 }
             }
         }
+        */
 
         Ok(device)
     }
