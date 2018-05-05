@@ -101,7 +101,9 @@ The remote dongle also will only answer to poll requests. It can't enter escape 
 
 ### Multitaps for PSX (SCPH-1070) and PS2 (SCPH-10090 and SCPH-70120)
 
-I don't own either of these, so they're at the bottom of the list. After reading psxpblib, it looks like the multi-tap uses the first byte of the command message to address a particular port. Normally it's set to 1, so I assume I can reach ports A, B, C, and D with 1, 2, 3, and 4 respectively.
+The multi-tap uses the first byte of the command message to address a particular port. Normally it's set to 1, and ports A, B, C, and D with 1, 2, 3, and 4 respectively.
+
+At one point when testing, the multitap replied with `0xff, 0x80, 0x5a` during polling. I'm not sure how to set it to that mode, but considering it works now I don't think I'll research it much further.
 
 
 Raw Data
@@ -147,6 +149,17 @@ Status:    01 02 01 02 01 00
 Const 1.1: 00 01 02 00 0a
 Const 1.2: 00 01 01 01 14
 Const 2:   00 02 00 01 00
+Const 3.1: 00 00 04 00 00
+Const 3.2: 00 00 04 00 00
+```
+
+#### BeamScope Dual Charger (Knockoff DualShock 1):
+
+```
+Status:    01 02 00 02 01 00
+Const 1.1: 00 01 02 00 0a
+Const 1.2: 00 01 01 01 14
+Const 2:   00 02 01 00 00
 Const 3.1: 00 00 04 00 00
 Const 3.2: 00 00 04 00 00
 ```
