@@ -87,6 +87,8 @@ const CMD_READ_CONST2: &[u8] = &[0x47, 0x00, 0x00, 0x5a, 0x5a, 0x5a, 0x5a, 0x5a]
 const CMD_READ_CONST3A: &[u8] = &[0x4C, 0x00, 0x00, 0x5a, 0x5a, 0x5a, 0x5a, 0x5a];
 /// Command to read constant 3 at address 01
 const CMD_READ_CONST3B: &[u8] = &[0x4C, 0x00, 0x01, 0x5a, 0x5a, 0x5a, 0x5a, 0x5a];
+/// Command to enable DualShock motors
+const CMD_MOTOR_DUALSHOCK: &[u8] = &[0x4D, 0x00, 0x00, 0x01, 0xff, 0xff, 0xff, 0xff]; 
 /// Command to enable JogCon motor
 const CMD_MOTOR_JOGCON: &[u8] = &[0x4D, 0x00, 0x00, 0xff, 0xff, 0xff, 0xff, 0xff]; 
 
@@ -616,6 +618,7 @@ where
 
         self.send_command(CMD_ENTER_ESCAPE_MODE, &mut buffer)?;
         self.send_command(CMD_SET_MODE, &mut buffer)?;
+        self.send_command(CMD_MOTOR_DUALSHOCK, &mut buffer)?;
         self.send_command(CMD_INIT_PRESSURE, &mut buffer)?;
         self.send_command(CMD_RESPONSE_FORMAT, &mut buffer)?;
         self.send_command(CMD_EXIT_ESCAPE_MODE, &mut buffer)?;
@@ -643,22 +646,31 @@ where
         Ok(())
     }
 
+    /// Control the vibration motors in the DualShock 1 or 2 controller.
+    /// 
+    /// * `little` - Turn on the little motor (no strength supported)
+    /// * `big` - Strength of the big right motor
+    pub fn control_dualshock(&mut self, little: bool, big: u8) -> Result<(), E> {
+        let mut command = [0u8; MESSAGE_MAX_LENGTH - 1];
+        let mut buffer = [0u8; MESSAGE_MAX_LENGTH];
+
+        command[..CMD_POLL.len()].copy_from_slice(CMD_POLL);
+        command[2] = if little { 0xff } else { 0x00 };
+        command[3] = big;
+
+        self.send_command(&command, &mut buffer)?;
+
+        Ok(())
+    }
+
     /// Control the JogCon's jogwheel.
     /// 
     /// * `strength` - A value between 0 and 15. Any higher will wrap around.
     pub fn control_jogcon(&mut self, control: JogControl, strength: u8) -> Result<(), E> {
-        let mut command = [0u8; MESSAGE_MAX_LENGTH];
+        let mut command = [0u8; MESSAGE_MAX_LENGTH - 1];
         let mut buffer = [0u8; MESSAGE_MAX_LENGTH];
 
-        let mut control: u8 = match control {
-            JogControl::Hold => JogControl::Hold as u8,
-            JogControl::Left => JogControl::Left as u8,
-            JogControl::Right => JogControl::Right as u8,
-            JogControl::Unknown1 => JogControl::Unknown1 as u8,
-            JogControl::Unknown2 => JogControl::Unknown2 as u8,
-            JogControl::Unknown3 => JogControl::Unknown3 as u8,
-            _ => JogControl::Stop as u8
-        };
+        let mut control = control as u8;
 
         control |= strength & 0x0f;
 
