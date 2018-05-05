@@ -45,7 +45,8 @@ fn main() {
 	let sleep_duration = time::Duration::from_micros(10_000);
 	let control_duration = time::Duration::from_secs(3);
 
-	psp.enable_jogcon().expect("Had trouble initializing the JogCon. Check /dev/spi* permissions.");
+	psp.enable_jogcon()
+		.expect("Had trouble initializing the JogCon. Check /dev/spi* permissions.");
 
 	println!("Use square, triangle, and circle to control the JogCon");
 	println!("       It will keep that state for three seconds");

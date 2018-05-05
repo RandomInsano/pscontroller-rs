@@ -64,31 +64,31 @@ const CONTROLLER_NEGCON: u8 = 0x23;
 const CONTROLLER_CONFIGURATION: u8 = 0xf3;
 
 /// Command to poll buttons
-const CMD_POLL: &[u8] = &[0x01, 0x42, 0x00];
+const CMD_POLL: &[u8] = &[0x42, 0x00];
 /// Command to enter escape mode
-const CMD_ENTER_ESCAPE_MODE: &[u8] = &[0x01, 0x43, 0x00, 0x01, 0x00];
+const CMD_ENTER_ESCAPE_MODE: &[u8] = &[0x43, 0x00, 0x01, 0x00];
 /// Command to exit escape mode
-const CMD_EXIT_ESCAPE_MODE: &[u8] = &[0x01, 0x43, 0x00, 0x00, 0x00];
+const CMD_EXIT_ESCAPE_MODE: &[u8] = &[0x43, 0x00, 0x00, 0x00];
 /// Command to set response format. Right now asks for all data
-const CMD_RESPONSE_FORMAT: &[u8] = &[0x01, 0x4F, 0x00, 0xFF, 0xFF, 0x03, 0x00, 0x00, 0x00];
+const CMD_RESPONSE_FORMAT: &[u8] = &[0x4F, 0x00, 0xFF, 0xFF, 0x03, 0x00, 0x00, 0x00];
 /// Command to initialize / customize pressure
-const CMD_INIT_PRESSURE: &[u8] = &[0x01, 0x40, 0x00, 0x00, 0x02, 0x00, 0x00, 0x00, 0x00];
+const CMD_INIT_PRESSURE: &[u8] = &[0x40, 0x00, 0x00, 0x02, 0x00, 0x00, 0x00, 0x00];
 /// Command to set major mode (DualShock = 1 / Digital = 0)
-const CMD_SET_MODE: &[u8] = &[0x01, 0x44, 0x00, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00];
+const CMD_SET_MODE: &[u8] = &[0x44, 0x00, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00];
 /// Command to read extended status
-const CMD_READ_STATUS: &[u8] = &[0x01, 0x45, 0x00, 0x5a, 0x5a, 0x5a, 0x5a, 0x5a, 0x5a];
+const CMD_READ_STATUS: &[u8] = &[0x45, 0x00, 0x5a, 0x5a, 0x5a, 0x5a, 0x5a, 0x5a];
 /// Command to read constant 1 at address 00
-const CMD_READ_CONST1A: &[u8] = &[0x01, 0x46, 0x00, 0x00, 0x5a, 0x5a, 0x5a, 0x5a, 0x5a];
+const CMD_READ_CONST1A: &[u8] = &[0x46, 0x00, 0x00, 0x5a, 0x5a, 0x5a, 0x5a, 0x5a];
 /// Command to read constant 1 at address 01
-const CMD_READ_CONST1B: &[u8] = &[0x01, 0x46, 0x00, 0x01, 0x5a, 0x5a, 0x5a, 0x5a, 0x5a];
+const CMD_READ_CONST1B: &[u8] = &[0x46, 0x00, 0x01, 0x5a, 0x5a, 0x5a, 0x5a, 0x5a];
 /// Command to read constant 2 at address 00
-const CMD_READ_CONST2: &[u8] = &[0x01, 0x47, 0x00, 0x00, 0x5a, 0x5a, 0x5a, 0x5a, 0x5a];
+const CMD_READ_CONST2: &[u8] = &[0x47, 0x00, 0x00, 0x5a, 0x5a, 0x5a, 0x5a, 0x5a];
 /// Command to read constant 3 at address 00
-const CMD_READ_CONST3A: &[u8] = &[0x01, 0x4C, 0x00, 0x00, 0x5a, 0x5a, 0x5a, 0x5a, 0x5a];
+const CMD_READ_CONST3A: &[u8] = &[0x4C, 0x00, 0x00, 0x5a, 0x5a, 0x5a, 0x5a, 0x5a];
 /// Command to read constant 3 at address 01
-const CMD_READ_CONST3B: &[u8] = &[0x01, 0x4C, 0x00, 0x01, 0x5a, 0x5a, 0x5a, 0x5a, 0x5a];
+const CMD_READ_CONST3B: &[u8] = &[0x4C, 0x00, 0x01, 0x5a, 0x5a, 0x5a, 0x5a, 0x5a];
 /// Command to enable JogCon motor
-const CMD_MOTOR_JOGCON: &[u8] = &[0x01, 0x4D, 0x00, 0x00, 0xff, 0xff, 0xff, 0xff, 0xff]; 
+const CMD_MOTOR_JOGCON: &[u8] = &[0x4D, 0x00, 0x00, 0xff, 0xff, 0xff, 0xff, 0xff]; 
 
 #[repr(C)]
 /// The poll command returns a series of bytes. This union allows us to interact with
@@ -131,6 +131,22 @@ pub enum JogState {
     TurnedRight,
     /// The wheel met its maximum recordable distance
     AtMaximum
+}
+
+/// The active port to set on the Multitap
+#[derive(Clone)]
+pub enum MultitapPort {
+    /// The first port on the multi-tap and also the port when no tap
+    /// is present
+    A = 0x01,
+    /// The second port on the multi-top
+    B = 0x02,
+    /// The third port on the multi-top
+    C = 0x03,
+    /// The fourth port on the multi-top
+    D = 0x04,
+    /// This may be for the multitap itself
+    X = 0xff,
 }
 
 /// The digital buttons of the gamepad
@@ -527,6 +543,7 @@ pub enum Device {
 pub struct PlayStationPort<SPI, CS> {
     dev: SPI,
     select: Option<CS>,
+    multitap_port: MultitapPort,
 }
 
 impl<E, SPI, CS> PlayStationPort<SPI, CS>
@@ -544,6 +561,7 @@ where
         Self {
             dev: spi,
             select: select,
+            multitap_port: MultitapPort::A,
         }
     }
 
@@ -553,9 +571,18 @@ where
 	    }
     }
 
+    /// Set the active port on the multi-tap. If no tap is being used, anything
+    /// other than `A` will fail to return anything. Or so I assume! Setting this
+    /// will mean any commands send will be directed towards that port indefinitely.
+    pub fn set_multitap_port(&mut self, port: MultitapPort) {
+        self.multitap_port = port;
+    }
+
     /// Sends commands to the underlying hardware and provides responses
     pub fn send_command(&mut self, command: &[u8], result: &mut [u8]) -> Result<(), E> {
-        result[0 .. command.len()].copy_from_slice(command);
+        // Pack in bytes for the command we'll be sending
+        result[0] = self.multitap_port.clone() as u8;
+        result[1 .. command.len() + 1].copy_from_slice(command);
 
         // Because not all hardware supports LSB mode for SPI, we flip
         // the bits ourselves

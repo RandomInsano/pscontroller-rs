@@ -9,10 +9,10 @@ The primary goal here is to support the DualShock 1/2 controllers as they're the
 * [x] JogCon
 * [x] JogCon force feedback
 * [x] NegCon
+* [x] PSX Multitap (SCPH-1070)
 * [ ] DualShock rumble
 * [ ] Guitar Hero guitar
 * [ ] Dual Analog
-* [ ] Multitaps
 * [x] ~~DVD Remote (doesn't follow spec)~~
 
 Notes for hacking status of these can be found in the 'research' folder.

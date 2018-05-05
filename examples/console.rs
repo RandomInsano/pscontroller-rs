@@ -37,12 +37,11 @@ fn main() {
     //let enable_pin = Pin::new(SPI_ENABLE_PIN);
     //let mut psp = PlayStationPort::new(spi, Some(enable_pin));
 	let mut psp = PlayStationPort::new(spi, None::<Pin>);
-	let mut command = [0u8; 21];
-	let mut buffer = [0u8; 21];
+	let mut command = [0u8; 31];
+	let mut buffer = [0u8; 32];
 
-	command[0] = 0x01;
-	command[1] = 0x42;
-	command[2] = 0x00;
+	command[0] = 0x42;
+	command[1] = 0x00;
 
 	let mut now = time::Instant::now();
 	let sleep_duration = time::Duration::from_micros(30_000);
