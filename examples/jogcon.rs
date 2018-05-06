@@ -14,7 +14,6 @@ extern crate embedded_hal;
 extern crate pscontroller_rs;
 
 use std::io;
-use std::{thread, time};
 use linux_hal::Spidev;
 use linux_hal::spidev::{SpidevOptions, SPI_MODE_3};
 use linux_hal::Pin;
@@ -23,7 +22,8 @@ use pscontroller_rs::{
 	PlayStationPort,
 	Device,
 	jogcon::{
-		JogControl
+		JogControl,
+		ControlJC
 	}
 };
 
@@ -47,20 +47,15 @@ fn build_spi() -> io::Result<Spidev> {
 fn main() {
     let spi = build_spi().unwrap();
     let mut psp = PlayStationPort::new(spi, None::<Pin>);
-
-	let sleep_duration = time::Duration::from_micros(10_000);
-	let control_duration = time::Duration::from_secs(3);
+	let mut control_jc = ControlJC::new(JogControl::Stop, 15);
 
 	psp.enable_jogcon()
 		.expect("Had trouble initializing the JogCon. Check /dev/spi* permissions.");
 
-	println!("Use square, triangle, and circle to control the JogCon");
-	println!("       It will keep that state for three seconds");
+	println!("Use square, triangle, circle, left, right and up to control the JogCon");
 
 	loop {
-		thread::sleep(sleep_duration);	
-
-		let controller = match psp.read_input() {
+		let controller = match psp.read_input(Some(&control_jc)) {
 			Ok(x) => x,
 			Err(_) => continue
 		};
@@ -74,29 +69,25 @@ fn main() {
 		// Control the jog wheel with the face buttons.
 		if jogcon.buttons.square() {
 			println!("    Left...  ");
-			psp.control_jogcon(JogControl::Left, 15).unwrap();
+			control_jc.mode = JogControl::Left;
 		} else if jogcon.buttons.triangle() {
 			println!("    Hold...  ");
-			psp.control_jogcon(JogControl::Hold, 15).unwrap();
+			control_jc.mode = JogControl::Hold;
 		} else if jogcon.buttons.circle() {
 			println!("    Right... ");
-			psp.control_jogcon(JogControl::Right, 15).unwrap();
+			control_jc.mode = JogControl::Right;
 		} else if jogcon.buttons.left() {
-			println!("    Unknown1... ");
-			psp.control_jogcon(JogControl::Unknown1, 0).unwrap();
+			println!("    Dropped revolution count ");
+			control_jc.mode = JogControl::DropRevolutions;
 		} else if jogcon.buttons.up() {
-			println!("    Unknown2... ");
-			psp.control_jogcon(JogControl::Unknown1, 15).unwrap();
+			println!("    Dropped revolution count and returning... ");
+			control_jc.mode = JogControl::DropAndHold;
 		} else if jogcon.buttons.right() {
-			println!("    Unknown3... ");
-			psp.control_jogcon(JogControl::Unknown1, 0).unwrap();
+			println!("    Set new hold position ");
+			control_jc.mode = JogControl::NewHold;
 		} else {
 			// Skip the pause that's coming up
-			continue;
+			control_jc.mode = JogControl::Stop;
 		}
-
-		thread::sleep(control_duration);
-
-		println!("     Ready");
 	}
 }

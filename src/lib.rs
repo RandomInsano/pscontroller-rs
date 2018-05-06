@@ -71,7 +71,7 @@ use hal::digital::OutputPin;
 use classic::Classic;
 use dualshock::{DualShock, DualShock2};
 use negcon::NegCon;
-use jogcon::{JogCon, JogControl};
+use jogcon::{JogCon};
 use guitarhero::GuitarHero;
 
 /// The maximum length of a message from a controller
@@ -99,33 +99,33 @@ const CONTROLLER_NEGCON: u8 = 0x23;
 const CONTROLLER_CONFIGURATION: u8 = 0xf3;
 
 /// Command to poll buttons
-const CMD_POLL: &[u8] = &[0x42, 0x00];
+const CMD_POLL: &[u8] = &[0x00, 0x42, 0x00];
 /// Command to enter escape mode
-const CMD_ENTER_ESCAPE_MODE: &[u8] = &[0x43, 0x00, 0x01, 0x00];
+const CMD_ENTER_ESCAPE_MODE: &[u8] = &[0x00, 0x43, 0x00, 0x01, 0x00];
 /// Command to exit escape mode
-const CMD_EXIT_ESCAPE_MODE: &[u8] = &[0x43, 0x00, 0x00, 0x00];
+const CMD_EXIT_ESCAPE_MODE: &[u8] = &[0x00, 0x43, 0x00, 0x00, 0x00];
 /// Command to set response format. Right now asks for all data
-const CMD_RESPONSE_FORMAT: &[u8] = &[0x4F, 0x00, 0xFF, 0xFF, 0x03, 0x00, 0x00, 0x00];
+const CMD_RESPONSE_FORMAT: &[u8] = &[0x00, 0x4F, 0x00, 0xFF, 0xFF, 0x03, 0x00, 0x00, 0x00];
 /// Command to initialize / customize pressure
-const CMD_INIT_PRESSURE: &[u8] = &[0x40, 0x00, 0x00, 0x02, 0x00, 0x00, 0x00, 0x00];
+const CMD_INIT_PRESSURE: &[u8] = &[0x00, 0x40, 0x00, 0x00, 0x02, 0x00, 0x00, 0x00, 0x00];
 /// Command to set major mode (DualShock = 1 / Digital = 0)
-const CMD_SET_MODE: &[u8] = &[0x44, 0x00, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00];
+const CMD_SET_MODE: &[u8] = &[0x00, 0x44, 0x00, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00];
 /// Command to read extended status
-const CMD_READ_STATUS: &[u8] = &[0x45, 0x00, 0x5a, 0x5a, 0x5a, 0x5a, 0x5a, 0x5a];
+const CMD_READ_STATUS: &[u8] = &[0x00, 0x45, 0x00, 0x5a, 0x5a, 0x5a, 0x5a, 0x5a, 0x5a];
 /// Command to read constant 1 at address 00
-const CMD_READ_CONST1A: &[u8] = &[0x46, 0x00, 0x00, 0x5a, 0x5a, 0x5a, 0x5a, 0x5a];
+const CMD_READ_CONST1A: &[u8] = &[0x00, 0x46, 0x00, 0x00, 0x5a, 0x5a, 0x5a, 0x5a, 0x5a];
 /// Command to read constant 1 at address 01
-const CMD_READ_CONST1B: &[u8] = &[0x46, 0x00, 0x01, 0x5a, 0x5a, 0x5a, 0x5a, 0x5a];
+const CMD_READ_CONST1B: &[u8] = &[0x00, 0x46, 0x00, 0x01, 0x5a, 0x5a, 0x5a, 0x5a, 0x5a];
 /// Command to read constant 2 at address 00
-const CMD_READ_CONST2: &[u8] = &[0x47, 0x00, 0x00, 0x5a, 0x5a, 0x5a, 0x5a, 0x5a];
+const CMD_READ_CONST2: &[u8] = &[0x00, 0x47, 0x00, 0x00, 0x5a, 0x5a, 0x5a, 0x5a, 0x5a];
 /// Command to read constant 3 at address 00
-const CMD_READ_CONST3A: &[u8] = &[0x4C, 0x00, 0x00, 0x5a, 0x5a, 0x5a, 0x5a, 0x5a];
+const CMD_READ_CONST3A: &[u8] = &[0x00, 0x4C, 0x00, 0x00, 0x5a, 0x5a, 0x5a, 0x5a, 0x5a];
 /// Command to read constant 3 at address 01
-const CMD_READ_CONST3B: &[u8] = &[0x4C, 0x00, 0x01, 0x5a, 0x5a, 0x5a, 0x5a, 0x5a];
+const CMD_READ_CONST3B: &[u8] = &[0x00, 0x4C, 0x00, 0x01, 0x5a, 0x5a, 0x5a, 0x5a, 0x5a];
 /// Command to enable DualShock motors
-const CMD_MOTOR_DUALSHOCK: &[u8] = &[0x4D, 0x00, 0x00, 0x01, 0xff, 0xff, 0xff, 0xff]; 
+const CMD_MOTOR_DUALSHOCK: &[u8] = &[0x00, 0x4D, 0x00, 0x00, 0x01, 0xff, 0xff, 0xff, 0xff];
 /// Command to enable JogCon motor
-const CMD_MOTOR_JOGCON: &[u8] = &[0x4D, 0x00, 0x00, 0xff, 0xff, 0xff, 0xff, 0xff]; 
+const CMD_MOTOR_JOGCON: &[u8] = &[0x00, 0x4D, 0x00, 0x00, 0xff, 0xff, 0xff, 0xff, 0xff];
 
 #[repr(C)]
 /// The poll command returns a series of bytes. This union allows us to interact with
@@ -157,13 +157,6 @@ pub enum MultitapPort {
     X = 0xff,
 }
 
-/// The digital buttons of the gamepad
-#[repr(C)]
-#[derive(Clone)]
-pub struct GamepadButtons {
-    data: u16,
-}
-
 /// Errors that can arrise from trying to communicate with the controller
 pub enum Error<E> {
     /// Late collision
@@ -178,6 +171,21 @@ impl<E> From<E> for Error<E> {
     fn from(e: E) -> Self {
         Error::Spi(e)
     }
+}
+
+/// The digital buttons of the gamepad
+#[repr(C)]
+#[derive(Clone)]
+pub struct GamepadButtons {
+    data: u16,
+}
+
+/// Commands to send off with a poll request.
+pub trait PollCommand {
+    /// Re-write the provided slice starting from index 0. This command
+    /// is called by read_input() which will provide a sub-slice of the
+    /// controller's command bytes.
+    fn set_command(&self, &mut [u8]);
 }
 
 /// Many controllers have the same set of buttons (Square, Circle, L3, R1, etc).
@@ -396,8 +404,8 @@ where
     /// Sends commands to the underlying hardware and provides responses
     pub fn send_command(&mut self, command: &[u8], result: &mut [u8]) -> Result<(), E> {
         // Pack in bytes for the command we'll be sending
+        result[..command.len()].copy_from_slice(command);
         result[0] = self.multitap_port.clone() as u8;
-        result[1 .. command.len() + 1].copy_from_slice(command);
 
         // Because not all hardware supports LSB mode for SPI, we flip
         // the bits ourselves
@@ -459,42 +467,6 @@ where
         Ok(())
     }
 
-    /// Control the vibration motors in the DualShock 1 or 2 controller.
-    /// 
-    /// * `little` - Turn on the little motor (no strength supported)
-    /// * `big` - Strength of the big right motor
-    pub fn control_dualshock(&mut self, little: bool, big: u8) -> Result<(), E> {
-        let mut command = [0u8; MESSAGE_MAX_LENGTH - 1];
-        let mut buffer = [0u8; MESSAGE_MAX_LENGTH];
-
-        command[..CMD_POLL.len()].copy_from_slice(CMD_POLL);
-        command[2] = if little { 0xff } else { 0x00 };
-        command[3] = big;
-
-        self.send_command(&command, &mut buffer)?;
-
-        Ok(())
-    }
-
-    /// Control the JogCon's jogwheel.
-    /// 
-    /// * `strength` - A value between 0 and 15. Any higher will wrap around.
-    pub fn control_jogcon(&mut self, control: JogControl, strength: u8) -> Result<(), E> {
-        let mut command = [0u8; MESSAGE_MAX_LENGTH - 1];
-        let mut buffer = [0u8; MESSAGE_MAX_LENGTH];
-
-        let mut control = control as u8;
-
-        control |= strength & 0x0f;
-
-        command[..CMD_POLL.len()].copy_from_slice(CMD_POLL);
-        command[3] = control;
-
-        self.send_command(&command, &mut buffer)?;
-
-        Ok(())
-    }
-
     /// Read various parameters from the controller including its current
     /// status.
     pub fn read_config(&mut self) -> Result<ControllerConfiguration, E> {
@@ -527,11 +499,18 @@ where
     }
 
     /// Ask the controller for input states. Different contoller types can be returned.
-    pub fn read_input(&mut self) -> Result<Device, Error<E>> {
+    pub fn read_input(&mut self, command: Option<&PollCommand>) -> Result<Device, Error<E>> {
         let mut buffer = [0u8; MESSAGE_MAX_LENGTH];
         let mut data = [0u8; MESSAGE_MAX_LENGTH];
 
-        self.send_command(CMD_POLL, &mut buffer)?;
+        data[..CMD_POLL.len()].copy_from_slice(CMD_POLL);
+
+        // Overlay the command to send with the poll...
+        if let Some(x) = command {
+            x.set_command(&mut data[3..]);
+        }
+
+        self.send_command(&data, &mut buffer)?;
         data[0 .. MESSAGE_MAX_LENGTH - 3].copy_from_slice(&buffer[3..]);
 
         let controller = ControllerData { data: data };

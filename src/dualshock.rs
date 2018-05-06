@@ -5,7 +5,8 @@
 
 use super::{
     HasStandardButtons,
-    GamepadButtons
+    GamepadButtons,
+    PollCommand
 };
 
 #[repr(C)]
@@ -53,5 +54,34 @@ pub struct DualShock2 {
 impl HasStandardButtons for DualShock2 {
     fn buttons(&self) -> GamepadButtons {
         self.buttons.clone()
+    }
+}
+
+/// Command for controlling the vibration motors in the
+/// dual shock controllers
+pub struct ControlDS {
+    /// Whether to turn on the small motor
+    pub little: bool,
+    /// How strong to run the large motor
+    pub big: u8,
+}
+
+impl ControlDS {
+    /// Create a new one of thes newfangled control commands
+    pub fn new(little: bool, big: u8) -> Self {
+        Self {
+            little: little,
+            big: big,
+        }
+    }
+}
+
+/// Implement the needed functions to control the motors on
+/// the DualShock controllers
+impl PollCommand for ControlDS {
+    /// Sets the command for the rumble motoros on the DualShock
+    fn set_command(&self, command: &mut [u8]) {
+        command[0] = if self.little { 0xff } else { 0x00 };
+        command[1] = self.big;
     }
 }

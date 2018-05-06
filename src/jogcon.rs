@@ -7,11 +7,13 @@
 
 use super::{
     HasStandardButtons,
-    GamepadButtons
+    GamepadButtons,
+    PollCommand,
 };
 
 /// What we want the JogCon's wheel to do after we
 /// poll it
+#[derive(Clone)]
 pub enum JogControl {
     /// Stop the motor
     Stop = 0x00,
@@ -21,12 +23,14 @@ pub enum JogControl {
     Left = 0x20,
     /// Start turning the wheel right
     Right = 0x10,
-    /// Unknown 1
-    Unknown1 = 0x80,
-    /// Unknown 2
-    Unknown2 = 0xb0,
-    /// Unknown 3
-    Unknown3 = 0xc0,
+    /// Drop how many revolutions were turned and keep track of
+    /// only the distance to return to the original angle
+    DropRevolutions = 0x80,
+    /// Drop how many revolutions were turned and return back
+    /// to the starting angle
+    DropAndHold = 0xb0,
+    /// Set a new hold position
+    NewHold = 0xc0,
 }
 
 /// What state the JogCon's wheel was in last poll
@@ -58,5 +62,32 @@ pub struct JogCon {
 impl HasStandardButtons for JogCon {
     fn buttons(&self) -> GamepadButtons {
         self.buttons.clone()
+    }
+}
+
+/// Command for controlling the wheel on the JogCon
+pub struct ControlJC {
+    /// The mode the wheel should be in (move left, move right, etc)
+	pub mode: JogControl,
+    /// How strong the motor should be working
+	pub strength: u8,
+}
+
+impl ControlJC {
+    /// Create a new one of thes newfangled control commands
+    pub fn new(mode: JogControl, strength: u8) -> Self {
+        Self {
+            mode: mode,
+            strength: strength,
+        }
+    }
+}
+
+/// Implement the needed functions to control the motor on the JogCon
+impl PollCommand for ControlJC {
+    /// Sets the command for the wheel on the JogCon
+    fn set_command(&self, command: &mut [u8]) {
+        command[0] = self.mode.clone() as u8;
+        command[0] |= self.strength & 0x0f;
     }
 }
