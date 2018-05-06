@@ -6,11 +6,11 @@ The primary goal here is to support the DualShock 1/2 controllers as they're the
 * [x] Original PlayStation digital mode
 * [x] DualShock 1/2 analog sticks
 * [x] DualShock 2 pressure sensitive buttons
+* [x] DualShock rumble
 * [x] JogCon
 * [x] JogCon force feedback
 * [x] NegCon
 * [x] PSX Multitap (SCPH-1070)
-* [ ] DualShock rumble
 * [ ] Guitar Hero guitar
 * [ ] Dual Analog
 * [x] ~~DVD Remote (doesn't follow spec)~~
