@@ -71,7 +71,7 @@ use hal::digital::OutputPin;
 use classic::Classic;
 use dualshock::{DualShock, DualShock2};
 use negcon::NegCon;
-use jogcon::{JogCon, JogControl};
+use jogcon::{JogCon};
 use guitarhero::GuitarHero;
 
 /// The maximum length of a message from a controller
@@ -157,13 +157,6 @@ pub enum MultitapPort {
     X = 0xff,
 }
 
-/// The digital buttons of the gamepad
-#[repr(C)]
-#[derive(Clone)]
-pub struct GamepadButtons {
-    data: u16,
-}
-
 /// Errors that can arrise from trying to communicate with the controller
 pub enum Error<E> {
     /// Late collision
@@ -178,6 +171,22 @@ impl<E> From<E> for Error<E> {
     fn from(e: E) -> Self {
         Error::Spi(e)
     }
+}
+
+/// The digital buttons of the gamepad
+#[repr(C)]
+#[derive(Clone)]
+pub struct GamepadButtons {
+    data: u16,
+}
+
+/// Commands to send off with a poll request. Six bytes should
+/// be more than enough
+pub trait PollCommand {
+    /// Return the bytes we'll lay in place. Exepectation is that
+    /// the array passed in is a mutable subslice as this command
+    /// will being writing at the start of the slice provided.
+    fn set_command(&self, &mut [u8]);
 }
 
 /// Many controllers have the same set of buttons (Square, Circle, L3, R1, etc).
@@ -459,42 +468,6 @@ where
         Ok(())
     }
 
-    /// Control the vibration motors in the DualShock 1 or 2 controller.
-    /// 
-    /// * `little` - Turn on the little motor (no strength supported)
-    /// * `big` - Strength of the big right motor
-    pub fn control_dualshock(&mut self, little: bool, big: u8) -> Result<(), E> {
-        let mut command = [0u8; MESSAGE_MAX_LENGTH - 1];
-        let mut buffer = [0u8; MESSAGE_MAX_LENGTH];
-
-        command[..CMD_POLL.len()].copy_from_slice(CMD_POLL);
-        command[2] = if little { 0xff } else { 0x00 };
-        command[3] = big;
-
-        self.send_command(&command, &mut buffer)?;
-
-        Ok(())
-    }
-
-    /// Control the JogCon's jogwheel.
-    /// 
-    /// * `strength` - A value between 0 and 15. Any higher will wrap around.
-    pub fn control_jogcon(&mut self, control: JogControl, strength: u8) -> Result<(), E> {
-        let mut command = [0u8; MESSAGE_MAX_LENGTH - 1];
-        let mut buffer = [0u8; MESSAGE_MAX_LENGTH];
-
-        let mut control = control as u8;
-
-        control |= strength & 0x0f;
-
-        command[..CMD_POLL.len()].copy_from_slice(CMD_POLL);
-        command[3] = control;
-
-        self.send_command(&command, &mut buffer)?;
-
-        Ok(())
-    }
-
     /// Read various parameters from the controller including its current
     /// status.
     pub fn read_config(&mut self) -> Result<ControllerConfiguration, E> {
@@ -527,11 +500,18 @@ where
     }
 
     /// Ask the controller for input states. Different contoller types can be returned.
-    pub fn read_input(&mut self) -> Result<Device, Error<E>> {
+    pub fn read_input(&mut self, command: Option<&PollCommand>) -> Result<Device, Error<E>> {
         let mut buffer = [0u8; MESSAGE_MAX_LENGTH];
         let mut data = [0u8; MESSAGE_MAX_LENGTH];
 
-        self.send_command(CMD_POLL, &mut buffer)?;
+        data[1 .. CMD_POLL.len() + 1].copy_from_slice(CMD_POLL);
+
+        // Overlay the command to send with the poll...
+        if let Some(x) = command {
+            x.set_command(&mut data[3..]);
+        }
+
+        self.send_command(&data, &mut buffer)?;
         data[0 .. MESSAGE_MAX_LENGTH - 3].copy_from_slice(&buffer[3..]);
 
         let controller = ControllerData { data: data };

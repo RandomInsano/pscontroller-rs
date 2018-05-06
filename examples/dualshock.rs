@@ -56,6 +56,7 @@ fn set_motors(buttons: &GamepadButtons, small: &mut bool, big: &mut u8) {
 fn main() {
     let spi = build_spi().unwrap();
     let mut psp = PlayStationPort::new(spi, None::<Pin>);
+    let mut control_ds = ControlDS::new(false, 0);
 
     psp.enable_pressure().unwrap();
 
@@ -64,7 +65,10 @@ fn main() {
     let mut small: bool = false;
 
     loop {
-        let controller = match psp.read_input() {
+        control_ds.small = small;
+        control_ds.big = big;
+
+        let controller = match psp.read_input(Some(&control_ds)) {
             Err(_) => {
                 print!("\rError reading controller");
                 continue;
@@ -95,8 +99,5 @@ fn main() {
             Device::None => println!("Please plug in a controller"),
             _ => println!("This example doesn't support the current controller"),
         } 
-
-        psp.control_dualshock(small, big).unwrap(); 
-        thread::sleep(control_duration);
     }
 }

@@ -58,7 +58,7 @@ fn main() {
     dump_hex(&config.const3a);
 
     loop {
-        let controller = match psp.read_input() {
+        let controller = match psp.read_input(None) {
             Err(_) => {
                 print!("\rError reading controller");
                 continue;

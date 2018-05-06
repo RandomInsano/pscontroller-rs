@@ -23,7 +23,8 @@ use pscontroller_rs::{
 	PlayStationPort,
 	Device,
 	jogcon::{
-		JogControl
+		JogControl,
+		ControlJC
 	}
 };
 
@@ -47,6 +48,7 @@ fn build_spi() -> io::Result<Spidev> {
 fn main() {
     let spi = build_spi().unwrap();
     let mut psp = PlayStationPort::new(spi, None::<Pin>);
+	let mut control_jc = ControlJC::new(JogControl.Stop, 15);
 
 	let sleep_duration = time::Duration::from_micros(10_000);
 	let control_duration = time::Duration::from_secs(3);
@@ -55,12 +57,11 @@ fn main() {
 		.expect("Had trouble initializing the JogCon. Check /dev/spi* permissions.");
 
 	println!("Use square, triangle, and circle to control the JogCon");
-	println!("       It will keep that state for three seconds");
 
 	loop {
 		thread::sleep(sleep_duration);	
 
-		let controller = match psp.read_input() {
+		let controller = match psp.read_input(Some(&control_ds)) {
 			Ok(x) => x,
 			Err(_) => continue
 		};
@@ -74,29 +75,25 @@ fn main() {
 		// Control the jog wheel with the face buttons.
 		if jogcon.buttons.square() {
 			println!("    Left...  ");
-			psp.control_jogcon(JogControl::Left, 15).unwrap();
+			control_jc.state = JogControl::Left;
 		} else if jogcon.buttons.triangle() {
 			println!("    Hold...  ");
-			psp.control_jogcon(JogControl::Hold, 15).unwrap();
+			control_jc.state = JogControl::Hold;
 		} else if jogcon.buttons.circle() {
 			println!("    Right... ");
-			psp.control_jogcon(JogControl::Right, 15).unwrap();
+			control_jc.state = JogControl::Right;
 		} else if jogcon.buttons.left() {
 			println!("    Unknown1... ");
-			psp.control_jogcon(JogControl::Unknown1, 0).unwrap();
+			control_jc.state = JogControl::Unknown1;
 		} else if jogcon.buttons.up() {
 			println!("    Unknown2... ");
-			psp.control_jogcon(JogControl::Unknown1, 15).unwrap();
+			control_jc.state = JogControl::Unknown2;
 		} else if jogcon.buttons.right() {
 			println!("    Unknown3... ");
-			psp.control_jogcon(JogControl::Unknown1, 0).unwrap();
+			control_jc.state = JogControl::Unknown3;
 		} else {
 			// Skip the pause that's coming up
-			continue;
+			control_jc.state = JogControl::Stop;
 		}
-
-		thread::sleep(control_duration);
-
-		println!("     Ready");
 	}
 }
