@@ -23,12 +23,14 @@ pub enum JogControl {
     Left = 0x20,
     /// Start turning the wheel right
     Right = 0x10,
-    /// Unknown 1
-    Unknown1 = 0x80,
-    /// Unknown 2
-    Unknown2 = 0xb0,
-    /// Unknown 3
-    Unknown3 = 0xc0,
+    /// Drop how many revolutions were turned and keep track of
+    /// only the distance to return to the original angle
+    DropRevolutions = 0x80,
+    /// Drop how many revolutions were turned and return back
+    /// to the starting angle
+    DropAndHold = 0xb0,
+    /// Set a new hold position
+    NewHold = 0xc0,
 }
 
 /// What state the JogCon's wheel was in last poll

@@ -14,7 +14,6 @@ extern crate embedded_hal;
 extern crate pscontroller_rs;
 
 use std::io;
-use std::{thread, time};
 use linux_hal::Spidev;
 use linux_hal::spidev::{SpidevOptions, SPI_MODE_3};
 use linux_hal::Pin;
@@ -48,20 +47,15 @@ fn build_spi() -> io::Result<Spidev> {
 fn main() {
     let spi = build_spi().unwrap();
     let mut psp = PlayStationPort::new(spi, None::<Pin>);
-	let mut control_jc = ControlJC::new(JogControl.Stop, 15);
-
-	let sleep_duration = time::Duration::from_micros(10_000);
-	let control_duration = time::Duration::from_secs(3);
+	let mut control_jc = ControlJC::new(JogControl::Stop, 15);
 
 	psp.enable_jogcon()
 		.expect("Had trouble initializing the JogCon. Check /dev/spi* permissions.");
 
-	println!("Use square, triangle, and circle to control the JogCon");
+	println!("Use square, triangle, circle, left, right and up to control the JogCon");
 
 	loop {
-		thread::sleep(sleep_duration);	
-
-		let controller = match psp.read_input(Some(&control_ds)) {
+		let controller = match psp.read_input(Some(&control_jc)) {
 			Ok(x) => x,
 			Err(_) => continue
 		};
@@ -75,25 +69,25 @@ fn main() {
 		// Control the jog wheel with the face buttons.
 		if jogcon.buttons.square() {
 			println!("    Left...  ");
-			control_jc.state = JogControl::Left;
+			control_jc.mode = JogControl::Left;
 		} else if jogcon.buttons.triangle() {
 			println!("    Hold...  ");
-			control_jc.state = JogControl::Hold;
+			control_jc.mode = JogControl::Hold;
 		} else if jogcon.buttons.circle() {
 			println!("    Right... ");
-			control_jc.state = JogControl::Right;
+			control_jc.mode = JogControl::Right;
 		} else if jogcon.buttons.left() {
-			println!("    Unknown1... ");
-			control_jc.state = JogControl::Unknown1;
+			println!("    Dropped revolution count ");
+			control_jc.mode = JogControl::DropRevolutions;
 		} else if jogcon.buttons.up() {
-			println!("    Unknown2... ");
-			control_jc.state = JogControl::Unknown2;
+			println!("    Dropped revolution count and returning... ");
+			control_jc.mode = JogControl::DropAndHold;
 		} else if jogcon.buttons.right() {
-			println!("    Unknown3... ");
-			control_jc.state = JogControl::Unknown3;
+			println!("    Set new hold position ");
+			control_jc.mode = JogControl::NewHold;
 		} else {
 			// Skip the pause that's coming up
-			control_jc.state = JogControl::Stop;
+			control_jc.mode = JogControl::Stop;
 		}
 	}
 }
