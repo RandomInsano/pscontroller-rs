@@ -19,7 +19,13 @@ use linux_hal::Spidev;
 use linux_hal::spidev::{SpidevOptions, SPI_MODE_3};
 use linux_hal::Pin;
 
-use pscontroller_rs::{PlayStationPort, Device, JogControl};
+use pscontroller_rs::{
+	PlayStationPort,
+	Device,
+	jogcon::{
+		JogControl
+	}
+};
 
 // Specific to the host device used on Linux, you'll have to change the following
 // parameters depending on your board and also export and allow writing to the GPIO

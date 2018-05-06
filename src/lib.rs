@@ -2,15 +2,18 @@
 //! ============================
 //! 
 //! The original PlayStation and most of its peripherals are 20+ years old at this point,
-//! but they're easy to interface with for fun projects, and wireless variants are easy
+//! but they're easy to interface with for fun projects and wireless variants are easy
 //! to come by while being [pretty cheap](https://www.amazon.ca/s/?ie=UTF8&keywords=ps2+wireless+controller)
 //! ($28 Canadian for two as of this writing).
 //! 
-//! The current state of this library is such that it's fairly naïve to which controller
-//! is plugged in, and will make a guess based on the device type (1 - 15) and
-//! how many 16bit words are being returned. For those who know the protocol, this library
-//! reads the second byte from the poll command and wraps the response in a struct based
-//! on that so it's lightweight on memory
+//! The current state of this library is such that it's pretty naïve to which controller
+//! is plugged in, and it will make a guess based on the response to a poll request. The
+//! response is broken into a header with an identification byte and an acknowledge byte and
+//! we use the whole identification byte and just assume the data its sending is correct.
+//! 
+//! If you own something particularly interesting for the PS1 or PS2 that plugs into the
+//! controller port and isn't supported here, feel free to reach out by creating an issue
+//! and we can work out some creative way to get the device working with this library.
 //! 
 //! Efficiencies can be made here, and things will likely improve, but the darn thing is
 //! useful now so let's start using it! If you find things to fix, please make an issue.
@@ -18,18 +21,44 @@
 //! Hardware
 //! -----------------------
 //! 
-//! Because the PlayStation could have up to four devices sharing the same SPI bus (two
-//! controllers and two memory cards), they made the data out (MISO) pin open drain so you'll
-//! need to add your own resistor. In my testing with a voltage divider on a PlayStation 2,
-//! the value is around 220 - 500 ohms. I'm not sure if the controller jack assembly
-//! contains one of these yet, so you should double check with a multimeter before plugging
-//! anything in.
+//! Because the PlayStation can have up to four devices sharing the same SPI bus (two
+//! controllers and two memory cards), they made the data out (MISO) pin open drain. That
+//! means that it can only pull the line low and you'll need to add your own resistor
+//! connected from that pin to +5v. In my testing with a voltage divider on a PlayStation 2,
+//! the value is between 220 and 500 ohms.
+//! 
+//! Development and testing is recommended to by done on a Raspberry Pi as it has a reliable
+//! SPI bus. Early testing on both a Next Thing Co. C.H.I.P. and an Odroid C1+ didn't go
+//! very well. The C.H.I.P. added unexpected clock changes, and the C1+ had voltage pull
+//! up/down problems with the data lines.
+//! 
+//! The controller itself is a 3.3v logic device and any force feedback is meant to be
+//! driven by the 7.5v cd-rom voltage. Testing using the 5v line on of the Raspberry Pi
+//! technically works, but the result is much weaker than the original console.
+//! 
+//! Bibliography
+//! -----------------------
+//! Here is the list of the great bits of documentation that helped get this project started
+//! and continue to provide a good cross-reference to double check the work done here.
+//! 
+//! * [psxpad.html](http://domisan.sakura.ne.jp/article/psxpad/psxpad.html) - Wiring, testing and bootstrapping game pad on Linux with SPI
+//! * [ps_eng.txt](http://kaele.com/~kashima/games/ps_eng.txt) - Controller / Memory Card Protocols (pre-DualShock)
+//! * [Playstation 2 (Dual Shock) controller protocol notes](https://gist.github.com/scanlime/5042071) - Command protocols
+//! * [psxpblib](http://www.debaser.force9.co.uk/psxpblib/) - Interfacing PlayStation controllers via the parallel port
+//! * [Simulated PS2 Controller for Autonomously playing Guitar Hero](http://procrastineering.blogspot.ca/2010/12/simulated-ps2-controller-for.html) - SPI protocol captures
+
 
 #![feature(untagged_unions)]
 #![no_std]
 #![deny(missing_docs)]
 #![deny(warnings)]
 #![feature(unsize)]
+
+pub mod classic;
+pub mod dualshock;
+pub mod negcon;
+pub mod jogcon;
+pub mod guitarhero;
 
 extern crate bit_reverse;
 extern crate bitflags;
@@ -38,6 +67,12 @@ extern crate embedded_hal as hal;
 use bit_reverse::ParallelReverse;
 use hal::blocking::spi;
 use hal::digital::OutputPin;
+
+use classic::Classic;
+use dualshock::{DualShock, DualShock2};
+use negcon::NegCon;
+use jogcon::{JogCon, JogControl};
+use guitarhero::GuitarHero;
 
 /// The maximum length of a message from a controller
 const MESSAGE_MAX_LENGTH: usize = 32;
@@ -106,35 +141,6 @@ union ControllerData {
     nc: NegCon,
 }
 
-/// What we want the JogCon's wheel to do after we
-/// poll it
-pub enum JogControl {
-    /// Stop the motor
-    Stop = 0x00,
-    /// Hold the wheel in position (and return it if it moves)
-    Hold = 0x30,
-    /// Start turning the wheel left
-    Left = 0x20,
-    /// Start turning the wheel right
-    Right = 0x10,
-    /// Unknown 1
-    Unknown1 = 0x80,
-    /// Unknown 2
-    Unknown2 = 0xb0,
-    /// Unknown 3
-    Unknown3 = 0xc0,
-}
-
-/// What state the JogCon's wheel was in last poll
-pub enum JogState {
-    /// The wheel was turned left
-    TurnedLeft,
-    /// The wheel was turned right
-    TurnedRight,
-    /// The wheel met its maximum recordable distance
-    AtMaximum
-}
-
 /// The active port to set on the Multitap
 #[derive(Clone)]
 pub enum MultitapPort {
@@ -157,14 +163,6 @@ pub enum MultitapPort {
 pub struct GamepadButtons {
     data: u16,
 }
-
-/// The digital buttons of the Namco NegCon
-#[repr(C)]
-#[derive(Clone)]
-pub struct NegconButtons {
-    data: u16,
-}
-
 
 /// Errors that can arrise from trying to communicate with the controller
 pub enum Error<E> {
@@ -304,74 +302,6 @@ impl GamepadButtons {
     }
 }
 
-/// The NegCon's version of `GamepadButtons`
-impl NegconButtons {
-    // Gamepad buttons are active low, so that's why we're comparing them to zero
-
-    const NC_SELECT: u16 = 0x0001;
-    const NC_START: u16 = 0x0008;
-    const NC_UP: u16 = 0x0010;
-    const NC_RIGHT: u16 = 0x0020;
-    const NC_DOWN: u16 = 0x0040;
-    const NC_LEFT: u16 = 0x0080;
-
-    const NC_R: u16 = 0x0800;
-    const NC_B: u16 = 0x1000;
-    const NC_A: u16 = 0x2000;
-
-
-    /// A button on the controller
-    pub fn select(&self) -> bool {
-        self.data & Self::NC_SELECT == 0
-    }
-
-    /// A button on the controller
-    pub fn start(&self) -> bool {
-        self.data & Self::NC_START == 0
-    }
-
-    /// A button on the controller
-    pub fn up(&self) -> bool {
-        self.data & Self::NC_UP == 0
-    }
-
-    /// A button on the controller
-    pub fn right(&self) -> bool {
-        self.data & Self::NC_RIGHT == 0
-    }
-
-    /// A button on the controller
-    pub fn down(&self) -> bool {
-        self.data & Self::NC_DOWN == 0
-    }
-
-    /// A button on the controller
-    pub fn left(&self) -> bool {
-        self.data & Self::NC_LEFT == 0
-    }
-
-    /// A button on the controller
-    pub fn r(&self) -> bool {
-        self.data & Self::NC_R == 0
-    }
-
-    /// A button on the controller
-    pub fn b(&self) -> bool {
-        self.data & Self::NC_B == 0
-    }
-
-    /// A button on the controller
-    pub fn a(&self) -> bool {
-        self.data & Self::NC_A == 0
-    }
-
-    /// The raw value of the buttons on the controller. Useful for
-    /// aggregate functions
-    pub fn bits(&self) -> u16 {
-        self.data
-    }
-}
-
 /// Holds information about the controller's configuration and constants
 #[derive(Default)]
 pub struct ControllerConfiguration {
@@ -387,123 +317,6 @@ pub struct ControllerConfiguration {
     pub const3a: [u8; 5],
     /// Unknown constant
     pub const3b: [u8; 5],
-}
-
-#[repr(C)]
-/// Represents the DualShock 2 controller
-pub struct DualShock2 {
-    /// Standard buttons (Cross, Circle, L3, Start, etc)
-    pub buttons: GamepadButtons,
-
-    /// Right analog stick, left and right
-    pub rx: u8,
-    /// Right analog stick, up and down
-    pub ry: u8,
-    /// Left analog stick, left and right
-    pub lx: u8,
-    /// Left analog stick, up and down
-    pub ly: u8,
-
-    /// List of possible pressure readings from the buttons
-    /// Note that these are configurable length
-    pub pressures: [u8; 8],
-}
-
-impl HasStandardButtons for DualShock2 {
-    fn buttons(&self) -> GamepadButtons {
-        self.buttons.clone()
-    }
-}
-
-#[repr(C)]
-/// Represents the DualShock 1 controller
-pub struct DualShock {
-    /// Standard buttons (Cross, Circle, L3, Start, etc)
-    pub buttons: GamepadButtons,
-
-    /// Right analog stick, left and right
-    pub rx: u8,
-    /// Right analog stick, up and down
-    pub ry: u8,
-    /// Left analog stick, left and right
-    pub lx: u8,
-    /// Left analog stick, up and down
-    pub ly: u8,
-}
-
-impl HasStandardButtons for DualShock {
-    fn buttons(&self) -> GamepadButtons {
-        self.buttons.clone()
-    }
-}
-
-#[repr(C)]
-/// Represents the Namco NegCon controller
-pub struct NegCon {
-    /// The NegCon's weird buttons (A, B, R, etc)
-    pub buttons: NegconButtons,
-
-    /// The position of the twist (center = 0x80)
-    pub twist: u8,
-
-    /// Position of switch I
-    pub switchi: u8,
-
-    /// Position of switch II
-    pub switchii: u8,
-
-    /// Position of switch L
-    pub switchl: u8
-}
-
-#[repr(C)]
-/// Represents the Namco JogCon controller
-pub struct JogCon {
-    // TODO: Implement an endian-safe accessor for jog_position
-    // TODO: Implement an enum accessor for jog_state
-
-    /// Standard buttons (Cross, Circle, L3, Start, etc)
-    pub buttons: GamepadButtons,
-
-    /// The absolute position of the jog wheel
-    pub jog_position: i16,
-
-    /// What state is the jog wheel in
-    pub jog_state: u8,
-}
-
-impl HasStandardButtons for JogCon {
-    fn buttons(&self) -> GamepadButtons {
-        self.buttons.clone()
-    }
-}
-
-#[repr(C)]
-/// Represents the classic Controller
-pub struct Classic {
-    /// Standard buttons (Cross, Circle, L3, Start)
-    pub buttons: GamepadButtons,
-}
-
-impl HasStandardButtons for Classic {
-    fn buttons(&self) -> GamepadButtons {
-        self.buttons.clone()
-    }
-}
-
-#[repr(C)]
-/// Represents a Guitar Hero controller
-pub struct GuitarHero {
-    // TODO: Figure out GH's button layout (strum up/down, fret colours)
-
-    /// The buttons, currently not mapped
-    pub buttons: u16,
-
-    // Lazily pad bytes
-    padding: [u8; 3],
-
-    /// The whammy bar's current position
-    pub whammy: u8,
 }
 
 /// Possible devices that can be returned by the poll command to the controller.
