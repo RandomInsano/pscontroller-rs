@@ -180,12 +180,11 @@ pub struct GamepadButtons {
     data: u16,
 }
 
-/// Commands to send off with a poll request. Six bytes should
-/// be more than enough
+/// Commands to send off with a poll request.
 pub trait PollCommand {
-    /// Return the bytes we'll lay in place. Exepectation is that
-    /// the array passed in is a mutable subslice as this command
-    /// will being writing at the start of the slice provided.
+    /// Re-write the provided slice starting from index 0. This command
+    /// is called by read_input() which will provide a sub-slice of the
+    /// controller's command bytes.
     fn set_command(&self, &mut [u8]);
 }
 
