@@ -13,6 +13,7 @@ Richard Davies who created the [PSX Peripheral Bus Library](http://www.debaser.f
 |        | SLPH-0007  |            | Nasca Pachinco Handle (untested); Twist = Twist, TW = B |
 |        | SLPH-0015  |            | Volume Controller (untested); Rotation = Twist, A = Start, B = A |
 |        |            | SLEH-0005  | MadKatz Steering Wheel (twitchy) |
+|        |            |            | Mad Maestro conductor baton |
 | 3      |            |            | Konami Lightgun (untested) |
 | 4      | SCPH-1010  | SCPH 1080  | Controller |
 |        | SCPH-1110  |            | Analog Joystick - Digital Mode |
@@ -104,6 +105,20 @@ The remote dongle also will only answer to poll requests. It can't enter escape 
 The multi-tap uses the first byte of the command message to address a particular port. Normally it's set to 1, and ports A, B, C, and D with 1, 2, 3, and 4 respectively.
 
 At one point when testing, the multitap replied with `0xff, 0x80, 0x5a` during polling. I'm not sure how to set it to that mode, but considering it works now I don't think I'll research it much further.
+
+### Mad Maestro Baton
+
+Well, this one looks... Odd. It's a wand with a removable shaft. It only answers to polling requests and doens't support escape mode (checked via the `scanner` tool in this package). When it does respond it can only keep up at around 60Hz as any faster will return no data at all. It seems to be made by [G.A.E. Inc.](https://en.wikipedia.org/wiki/GAE_(company)) and contains a "GAE-1" chip by Optec Co. Ltd.
+
+Identifier: 0x2
+
+The format looks like this:
+
+```
+ff 23 5a - ff ff 80 80 80 80
+```
+
+The first two response bytes are for buttons "A" (bit 4 of byte 1) and "B" (bit 2 of byte 2). The third byte seems to be the acceleration sensed, and the last three return nothing, but I'm expecting it to have been an accelerometer. I've opened it up and there are two metal shields. We'll see what's under those and see if I can fix/replace them.
 
 
 Raw Data
