@@ -108,7 +108,7 @@ At one point when testing, the multitap replied with `0xff, 0x80, 0x5a` during p
 
 ### Mad Maestro Baton
 
-Well, this one looks... Odd. It's a wand with a removable shaft. It only answers to polling requests and doens't support escape mode (checked via the `scanner` tool in this package). When it does respond it can only keep up at around 60Hz as any faster will return no data at all. It seems to be made by [G.A.E. Inc.](https://en.wikipedia.org/wiki/GAE_(company)) and contains a "GAE-1" chip by Optec Co. Ltd.
+Well, this one looks... Odd. It's a wand with a removable shaft. It only answers to polling requests and doens't support escape mode (checked via the `scanner` tool in this package). When it does respond it can only keep up at around 60Hz as any faster will return no bytes until data is ready again. It seems to be made by [G.A.E. Inc.](https://en.wikipedia.org/wiki/GAE_(company)) and contains a "GAE-1" custom chip and the internals are designed by Optec Co. Ltd.
 
 Identifier: 0x2
 
