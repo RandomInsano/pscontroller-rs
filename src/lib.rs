@@ -507,11 +507,11 @@ where
 
         // Overlay the command to send with the poll...
         if let Some(x) = command {
-            x.set_command(&mut data[3..]);
+            x.set_command(&mut data[HEADER_LEN..]);
         }
 
         self.send_command(&data, &mut buffer)?;
-        data[0 .. MESSAGE_MAX_LENGTH - 3].copy_from_slice(&buffer[3..]);
+        data[0 .. MESSAGE_MAX_LENGTH - 3].copy_from_slice(&buffer[HEADER_LEN..]);
 
         let controller = ControllerData { data: data };
         let device;
