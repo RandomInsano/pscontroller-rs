@@ -47,7 +47,11 @@ Original controller without analog sticks.
 
 Identifier: 0xC
 
-This one responds with "ff c1 da" when polled. This doesn't seem normal at all and when issuing bad commands while in escape mode, the response is 0xc1 no matter which controller I use. Also, the left and square buttons don't seem to work so it makes sense that it may be in an error state.
+Fairly simple controller. While it doesn't have an escape mode it does respond to a fair number of commands more than the newer controllers. 
+
+Responses to various commands through `scanner.rs` in the examples:
+
+(Need to dump this)
 
 ### JogCon
 
@@ -55,7 +59,11 @@ Namco's force-feedback handheld controller
 
 Identifier 0xE
 
-This pre-dates the analog controllers from Sony, but answers to the same commands as the DualShocks. If you don't press any buttons on the controller for 60 seconds it will disable itself until a button is pressed again. Ridge Racer games call this "Safety Mode".
+If you don't press any buttons on the controller for 60 seconds the wheel will disable itself until a button is pressed again. Ridge Racer games call this "Safety Mode". I haven't checked to see if there is a status bit set for this.
+
+Responses to various commands through `scanner.rs` in the examples:
+
+(Need to dump this)
 
 #### Polling response data
 
@@ -79,32 +87,96 @@ The command byte when the motor is enabled (same as dual shock) seems to be brok
 0xC = Unknown, is followed by 0xff five times, occured once, drive value 0
 ```
 
-### DualShock (SCPH-1200) and DualShock 2 (SCPH-10010)
+### DualShock (SCPH-1200)
 
-Lots of documentation on these guys (check the bibliography) and should be straightforward to support.
+Identifier 0x7
 
-Identifier 0x4
-
-Responds to polling with "ff 41 5a"
-
-Fuzzing Results: (DualShock 2)
+Responses to various commands through `scanner.rs` in the examples:
 
 ```
-Fuzz: 42 - ff 41 5a ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff 
-Fuzz: c2 - ff 41 5a ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff 
+Err Rate: (0000/0000) - (Cmd:40) ff f3 5a 00 00 00 00 00 00 ff 
+Err Rate: (0000/0000) - (Cmd:41) ff f3 5a 00 00 00 00 00 00 ff 
+Err Rate: (0000/0000) - (Cmd:42) ff 41 5a ff ff ff ff ff ff ff 
+Err Rate: (0000/0000) - (Cmd:43) ff f3 5a 00 00 00 00 00 00 ff 
+Err Rate: (0000/0000) - (Cmd:44) ff f3 5a 00 00 00 00 00 00 ff 
+Err Rate: (0000/0000) - (Cmd:45) ff f3 5a 01 02 00 02 01 00 ff 
+Err Rate: (0000/0000) - (Cmd:46) ff f3 5a 00 00 01 02 00 0a ff 
+Err Rate: (0000/0000) - (Cmd:47) ff f3 5a 00 00 02 00 01 00 ff 
+Err Rate: (0000/0000) - (Cmd:48) ff f3 5a 00 00 00 00 01 00 ff 
+Err Rate: (0000/0000) - (Cmd:49) ff f3 5a 00 00 00 00 00 00 ff 
+Err Rate: (0000/0000) - (Cmd:4a) ff f3 5a 00 00 00 00 00 00 ff 
+Err Rate: (0000/0000) - (Cmd:4c) ff f3 5a 00 00 00 04 00 00 ff 
+Err Rate: (0000/0000) - (Cmd:4d) ff f3 5a ff ff ff ff ff ff ff 
+Err Rate: (0000/0000) - (Cmd:4e) ff f3 5a 00 00 00 00 00 00 ff 
+```
+
+
+### DualShock 2 (SCPH-10010)
+
+Sony seems to have extended the command a little for this one as there is now the ability to specify the polling response (command 0x4f) and there is also some new stats or constant at command 0xa0.
+
+Identifier 0x7
+
+Responses to various commands through `scanner.rs` in the examples:
+
+```
+Err Rate: (0334/0008) - (Cmd:40) ff f3 5a 00 00 00 00 00 00 ff 
+Err Rate: (0334/0008) - (Cmd:41) ff f3 5a 00 00 00 00 00 00 ff 
+Err Rate: (0334/0008) - (Cmd:42) ff f3 5a ff ff 89 85 79 8c ff 
+Err Rate: (0334/0008) - (Cmd:43) ff f3 5a 00 00 00 00 00 00 ff 
+Err Rate: (0334/0008) - (Cmd:44) ff f3 5a 00 00 00 00 00 00 ff 
+Err Rate: (0334/0008) - (Cmd:45) ff f3 5a 03 02 00 02 01 00 ff 
+Err Rate: (0334/0008) - (Cmd:46) ff f3 5a 00 00 01 02 00 0a ff 
+Err Rate: (0334/0008) - (Cmd:47) ff f3 5a 00 00 02 00 01 00 ff 
+Err Rate: (0334/0008) - (Cmd:48) ff f3 5a 00 00 00 00 01 00 ff 
+Err Rate: (0334/0008) - (Cmd:49) ff f3 5a 00 00 00 00 00 00 ff 
+Err Rate: (0334/0008) - (Cmd:4a) ff f3 5a 00 00 00 00 00 00 ff 
+Err Rate: (0334/0008) - (Cmd:4b) ff f3 5a 00 00 00 00 00 00 ff 
+Err Rate: (0334/0008) - (Cmd:4c) ff f3 5a 00 00 00 04 00 00 ff 
+Err Rate: (0334/0008) - (Cmd:4d) ff f3 5a ff ff ff ff ff ff ff 
+Err Rate: (0334/0008) - (Cmd:4e) ff f3 5a 00 00 00 00 00 00 ff 
+Err Rate: (0334/0008) - (Cmd:4f) ff f3 5a 00 00 00 00 00 00 ff 
+Err Rate: (0334/0008) - (Cmd:a0) ff f3 5a 05 01 02 00 00 00 ff 
+```
+
+### Guitar Hero Controller
+
+This responds nearly identically to the DualShock 1, but supports the polling response customization command (0x4f). The buttons, strum, and star power switch all correspond to certain face buttons that I haven't mapped yet. The whammy bar corresponds to one of the analog axis of the DualShock 1.
+
+The only way I can see to differentiate this controller from the PSX DualShock controller is to either use the unusal response to command 0x42 in escape mode, or the fact that it does respond to 0x4f. It will also take some restructuring of the library internally.
+
+Responses to various commands through `scanner.rs` in the examples:
+
+```
+Err Rate: (0000/0000) - (Cmd:40) ff f3 5a 00 00 00 00 00 00 ff 
+Err Rate: (0000/0000) - (Cmd:41) ff f3 5a 00 00 00 00 00 00 ff 
+Err Rate: (0000/0000) - (Cmd:42) ff f3 5a 7f ff 7f 7f 7f 7f ff 
+Err Rate: (0000/0000) - (Cmd:43) ff f3 5a 00 00 00 00 00 00 ff 
+Err Rate: (0000/0000) - (Cmd:44) ff f3 5a 00 00 00 00 00 00 ff 
+Err Rate: (0000/0000) - (Cmd:45) ff f3 5a 01 02 00 02 01 00 ff 
+Err Rate: (0000/0000) - (Cmd:46) ff f3 5a 00 00 01 02 00 0a ff 
+Err Rate: (0000/0000) - (Cmd:47) ff f3 5a 00 00 02 00 01 00 ff 
+Err Rate: (0000/0000) - (Cmd:48) ff f3 5a 00 00 00 00 01 00 ff 
+Err Rate: (0000/0000) - (Cmd:49) ff f3 5a 00 00 00 00 00 00 ff 
+Err Rate: (0000/0000) - (Cmd:4a) ff f3 5a 00 00 00 00 00 00 ff 
+Err Rate: (0000/0000) - (Cmd:4b) ff f3 5a 00 00 00 00 00 00 ff 
+Err Rate: (0000/0000) - (Cmd:4c) ff f3 5a 00 00 00 04 00 00 ff 
+Err Rate: (0000/0000) - (Cmd:4d) ff f3 5a ff ff ff ff ff ff ff 
+Err Rate: (0000/0000) - (Cmd:4e) ff f3 5a 00 00 00 00 00 00 ff 
+Err Rate: (0335/0000) - (Cmd:4f) ff f3 5a 00 00 00 00 00 00 ff 
 ```
 
 ### DVD Remote Reciever (SCPH-10160)
 
-This device does not conform to the standard protocols that the other devices do. Near as I can tell, the additional 32 buttons on the device are encoded into the ACK responses. When performing a real-time dump of the SPI data, button presses registered, but I did notice the 1us pull-down time of the ACK line expand to 2us. I'll have to use an oscilliscope to trigger on the CS line to get any deeper on this one.
+This device does not conform to the standard protocols that the other devices do. Near as I can tell, the additional 32 buttons on the device are encoded into the ACK responses. When performing a real-time dump of the SPI data, default buttons for the PlayStation (Circle, Square, etc) registered, but there was nothing from the DVD-specific buttons (Play, Paus, Stop). I did notice from logic analyser dump that there seemed to be exact timeing changes to the ACK line. The pull-down time was either 1us or 2us between bytes. I'll have to use an oscilliscope to trigger on the CS line to get any deeper on this one.
 
 The remote dongle also will only answer to poll requests. It can't enter escape mode, and does not respond to any other commands. With the DVD software 2.10 installed on the PlayStation 2, the only command every sent or acknowledged is poll (0x42) which responds with 0x41
 
 ### Multitaps for PSX (SCPH-1070) and PS2 (SCPH-10090 and SCPH-70120)
 
-The multi-tap uses the first byte of the command message to address a particular port. Normally it's set to 1, and ports A, B, C, and D with 1, 2, 3, and 4 respectively.
+The multi-tap uses the first byte of the message sent to the controller to address a particular port. Normally that bytes is set to 1. Ports A, B, C, and D correspond with 1, 2, 3, and 4 respectively.
 
-At one point when testing, the multitap replied with `0xff, 0x80, 0x5a` during polling. I'm not sure how to set it to that mode, but considering it works now I don't think I'll research it much further.
+At one point when testing, the multitap replied with `0xff, 0x80, 0x5a` during polling. I tried fuzzing by running a poll command against all addresses between zero and 255, but no luck there. I'd still like to do a read on a console while things are in use, but it looks like there really is nothing here other than a really fast SPI switcher.
 
 ### Mad Maestro Baton
 
@@ -178,6 +250,8 @@ Const 2:   00 02 01 00 00
 Const 3.1: 00 00 04 00 00
 Const 3.2: 00 00 04 00 00
 ```
+
+The fact that Const 2 here is a little off from the official controllers seems to show that it doesn't matter much.
 
 #### PlayStation DualShock 2:
 

@@ -1,11 +1,9 @@
 //! Control the JogCon
 //! ======================
-//! This example sends a control command to the JogCon, but at the moment
-//! the API is fairly useless. Because the polling command is the one that
-//! sets the JogCon's wheel mode, any time you read the buttons you will
-//! disable the current control. That means this library needs to change
-//! to accomodate that, but for now you can wait a few seconds when mashing
-//! some buttons at least. :)
+//! This example sends a control command to the JogCon depending on
+//! the buttons you've pressed. All the different control commands
+//! are represented and you can send them with square, triangle,
+//! circle, left, up, and right.
 
 #![feature(duration_from_micros)]
 

@@ -15,7 +15,7 @@ use pscontroller_rs::PlayStationPort;
 // Specific to the host device used on Linux, you'll have to change the following
 // parameters depending on your board and also export and allow writing to the GPIO
 const SPI_DEVICE: &str = "/dev/spidev0.0";
-const SPI_SPEED: u32 = 10_000;
+const SPI_SPEED: u32 = 100_000;
 // If you need to use an alternate pin for cable select, uncomment the relevant bits
 // and pass the pin into psp's new() function.
 //const SPI_ENABLE_PIN: u64 = 4; 
@@ -40,11 +40,10 @@ fn main() {
 	let mut command = [0u8; 32];
 	let mut buffer = [0u8; 32];
 
-	command[0] = 0x42;
-	command[1] = 0x00;
+	command[1] = 0x42;
 
 	let mut now = time::Instant::now();
-	let sleep_duration = time::Duration::from_micros(30_000);
+	let sleep_duration = time::Duration::from_micros(20_000);
 	let sample_duration = time::Duration::from_secs(1);
 	let mut count = 0;
 	let mut failure = 0;
