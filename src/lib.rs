@@ -142,7 +142,7 @@ union ControllerData {
 }
 
 /// The active port to set on the Multitap
-#[derive(Clone)]
+#[derive(Clone, PartialEq)]
 pub enum MultitapPort {
     /// The first port on the multi-tap and also the port when no tap
     /// is present
