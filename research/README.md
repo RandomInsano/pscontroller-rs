@@ -57,7 +57,7 @@ Responses to various commands through `scanner.rs` in the examples:
 
 Namco's force-feedback handheld controller
 
-Identifier 0xE
+Identifier: 0xE
 
 If you don't press any buttons on the controller for 60 seconds the wheel will disable itself until a button is pressed again. Ridge Racer games call this "Safety Mode". I haven't checked to see if there is a status bit set for this.
 
@@ -65,11 +65,25 @@ Responses to various commands through `scanner.rs` in the examples:
 
 (Need to dump this)
 
+### NeGcon
+
+Namco's weird twisty controller
+
+Identifier: 0x2
+
+While testing the NeGcon protocol using the JogCon's secret emulation of it, there isn't a lot to go on. It seems to only answer polling requests and does not support the escape mode. The only results from scanning was this:
+
+```text
+Command 42: ff 23 5a ff ff 8a 00 00 00 ff
+```
+
+There are a large number of controllers that respond with an identifier of 0x2 and it makes automatic detection of this controller brittle versus say, the baton controller. How do we know which one has been plugged in for example? Neither have escape modes for constants, bot report the same number of bytes in their response. Mighty tricky I say!
+
 #### Polling response data
 
 The polling response is 3*16 bits long. The first 16 bits of the response are the usual buttons, followed by a signed 16bit number for the jog wheel's absolute position. The second last byte is the JogCon's current status while the last byte is always zero. The six different control values I saw while playing one lap in Ridge Racer V where:
 
-```
+```text
 0x01 = Clockwise
 0x02 = Counter Clockwise
 0x04 = Max reached (either CW or CCW)
@@ -78,7 +92,7 @@ The polling response is 3*16 bits long. The first 16 bits of the response are th
 
 The command byte when the motor is enabled (same as dual shock) seems to be broken into two nybbles. The first is the mode, and the second is how hard to drive the motor (0 - 127).
 
-```
+```text
 0x1 = Turn clockwise
 0x2 = Turn counter clockwise
 0x3 = Hold at position
@@ -93,7 +107,7 @@ Identifier 0x7
 
 Responses to various commands through `scanner.rs` in the examples:
 
-```
+```text
 Err Rate: (0000/0000) - (Cmd:40) ff f3 5a 00 00 00 00 00 00 ff 
 Err Rate: (0000/0000) - (Cmd:41) ff f3 5a 00 00 00 00 00 00 ff 
 Err Rate: (0000/0000) - (Cmd:42) ff 41 5a ff ff ff ff ff ff ff 
