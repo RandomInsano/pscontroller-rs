@@ -34,6 +34,7 @@ Richard Davies who created the [PSX Peripheral Bus Library](http://www.debaser.f
 | 12     | N/A        | N/A        | This may be a reserved error state |
 
 Notes:
+
 * Devices can have different operating modes and will report differently depending on the mode.
 * The device ID is purposely not repeated for readability.
 * Removed the "E" designation from the list official controllers. My guess is that different regions have different letters.
@@ -108,20 +109,20 @@ Identifier 0x7
 Responses to various commands through `scanner.rs` in the examples:
 
 ```text
-Err Rate: (0000/0000) - (Cmd:40) ff f3 5a 00 00 00 00 00 00 ff 
-Err Rate: (0000/0000) - (Cmd:41) ff f3 5a 00 00 00 00 00 00 ff 
-Err Rate: (0000/0000) - (Cmd:42) ff 41 5a ff ff ff ff ff ff ff 
-Err Rate: (0000/0000) - (Cmd:43) ff f3 5a 00 00 00 00 00 00 ff 
-Err Rate: (0000/0000) - (Cmd:44) ff f3 5a 00 00 00 00 00 00 ff 
-Err Rate: (0000/0000) - (Cmd:45) ff f3 5a 01 02 00 02 01 00 ff 
-Err Rate: (0000/0000) - (Cmd:46) ff f3 5a 00 00 01 02 00 0a ff 
-Err Rate: (0000/0000) - (Cmd:47) ff f3 5a 00 00 02 00 01 00 ff 
-Err Rate: (0000/0000) - (Cmd:48) ff f3 5a 00 00 00 00 01 00 ff 
-Err Rate: (0000/0000) - (Cmd:49) ff f3 5a 00 00 00 00 00 00 ff 
-Err Rate: (0000/0000) - (Cmd:4a) ff f3 5a 00 00 00 00 00 00 ff 
-Err Rate: (0000/0000) - (Cmd:4c) ff f3 5a 00 00 00 04 00 00 ff 
-Err Rate: (0000/0000) - (Cmd:4d) ff f3 5a ff ff ff ff ff ff ff 
-Err Rate: (0000/0000) - (Cmd:4e) ff f3 5a 00 00 00 00 00 00 ff 
+(Cmd:40) ff f3 5a 00 00 00 00 00 00 ff
+(Cmd:41) ff f3 5a 00 00 00 00 00 00 ff
+(Cmd:42) ff 41 5a ff ff ff ff ff ff ff
+(Cmd:43) ff f3 5a 00 00 00 00 00 00 ff
+(Cmd:44) ff f3 5a 00 00 00 00 00 00 ff
+(Cmd:45) ff f3 5a 01 02 00 02 01 00 ff
+(Cmd:46) ff f3 5a 00 00 01 02 00 0a ff
+(Cmd:47) ff f3 5a 00 00 02 00 01 00 ff
+(Cmd:48) ff f3 5a 00 00 00 00 01 00 ff
+(Cmd:49) ff f3 5a 00 00 00 00 00 00 ff
+(Cmd:4a) ff f3 5a 00 00 00 00 00 00 ff
+(Cmd:4c) ff f3 5a 00 00 00 04 00 00 ff
+(Cmd:4d) ff f3 5a ff ff ff ff ff ff ff
+(Cmd:4e) ff f3 5a 00 00 00 00 00 00 ff
 ```
 
 
@@ -133,24 +134,24 @@ Identifier 0x7
 
 Responses to various commands through `scanner.rs` in the examples:
 
-```
-Err Rate: (0334/0008) - (Cmd:40) ff f3 5a 00 00 00 00 00 00 ff 
-Err Rate: (0334/0008) - (Cmd:41) ff f3 5a 00 00 00 00 00 00 ff 
-Err Rate: (0334/0008) - (Cmd:42) ff f3 5a ff ff 89 85 79 8c ff 
-Err Rate: (0334/0008) - (Cmd:43) ff f3 5a 00 00 00 00 00 00 ff 
-Err Rate: (0334/0008) - (Cmd:44) ff f3 5a 00 00 00 00 00 00 ff 
-Err Rate: (0334/0008) - (Cmd:45) ff f3 5a 03 02 00 02 01 00 ff 
-Err Rate: (0334/0008) - (Cmd:46) ff f3 5a 00 00 01 02 00 0a ff 
-Err Rate: (0334/0008) - (Cmd:47) ff f3 5a 00 00 02 00 01 00 ff 
-Err Rate: (0334/0008) - (Cmd:48) ff f3 5a 00 00 00 00 01 00 ff 
-Err Rate: (0334/0008) - (Cmd:49) ff f3 5a 00 00 00 00 00 00 ff 
-Err Rate: (0334/0008) - (Cmd:4a) ff f3 5a 00 00 00 00 00 00 ff 
-Err Rate: (0334/0008) - (Cmd:4b) ff f3 5a 00 00 00 00 00 00 ff 
-Err Rate: (0334/0008) - (Cmd:4c) ff f3 5a 00 00 00 04 00 00 ff 
-Err Rate: (0334/0008) - (Cmd:4d) ff f3 5a ff ff ff ff ff ff ff 
-Err Rate: (0334/0008) - (Cmd:4e) ff f3 5a 00 00 00 00 00 00 ff 
-Err Rate: (0334/0008) - (Cmd:4f) ff f3 5a 00 00 00 00 00 00 ff 
-Err Rate: (0334/0008) - (Cmd:a0) ff f3 5a 05 01 02 00 00 00 ff 
+```text
+(Cmd:40) ff f3 5a 00 00 00 00 00 00 ff
+(Cmd:41) ff f3 5a 00 00 00 00 00 00 ff
+(Cmd:42) ff f3 5a ff ff 89 85 79 8c ff
+(Cmd:43) ff f3 5a 00 00 00 00 00 00 ff
+(Cmd:44) ff f3 5a 00 00 00 00 00 00 ff
+(Cmd:45) ff f3 5a 03 02 00 02 01 00 ff
+(Cmd:46) ff f3 5a 00 00 01 02 00 0a ff
+(Cmd:47) ff f3 5a 00 00 02 00 01 00 ff
+(Cmd:48) ff f3 5a 00 00 00 00 01 00 ff
+(Cmd:49) ff f3 5a 00 00 00 00 00 00 ff
+(Cmd:4a) ff f3 5a 00 00 00 00 00 00 ff
+(Cmd:4b) ff f3 5a 00 00 00 00 00 00 ff
+(Cmd:4c) ff f3 5a 00 00 00 04 00 00 ff
+(Cmd:4d) ff f3 5a ff ff ff ff ff ff ff
+(Cmd:4e) ff f3 5a 00 00 00 00 00 00 ff
+(Cmd:4f) ff f3 5a 00 00 00 00 00 00 ff
+(Cmd:a0) ff f3 5a 05 01 02 00 00 00 ff
 ```
 
 ### Guitar Hero Controller
@@ -161,23 +162,23 @@ The only way I can see to differentiate this controller from the PSX DualShock c
 
 Responses to various commands through `scanner.rs` in the examples:
 
-```
-Err Rate: (0000/0000) - (Cmd:40) ff f3 5a 00 00 00 00 00 00 ff 
-Err Rate: (0000/0000) - (Cmd:41) ff f3 5a 00 00 00 00 00 00 ff 
-Err Rate: (0000/0000) - (Cmd:42) ff f3 5a 7f ff 7f 7f 7f 7f ff 
-Err Rate: (0000/0000) - (Cmd:43) ff f3 5a 00 00 00 00 00 00 ff 
-Err Rate: (0000/0000) - (Cmd:44) ff f3 5a 00 00 00 00 00 00 ff 
-Err Rate: (0000/0000) - (Cmd:45) ff f3 5a 01 02 00 02 01 00 ff 
-Err Rate: (0000/0000) - (Cmd:46) ff f3 5a 00 00 01 02 00 0a ff 
-Err Rate: (0000/0000) - (Cmd:47) ff f3 5a 00 00 02 00 01 00 ff 
-Err Rate: (0000/0000) - (Cmd:48) ff f3 5a 00 00 00 00 01 00 ff 
-Err Rate: (0000/0000) - (Cmd:49) ff f3 5a 00 00 00 00 00 00 ff 
-Err Rate: (0000/0000) - (Cmd:4a) ff f3 5a 00 00 00 00 00 00 ff 
-Err Rate: (0000/0000) - (Cmd:4b) ff f3 5a 00 00 00 00 00 00 ff 
-Err Rate: (0000/0000) - (Cmd:4c) ff f3 5a 00 00 00 04 00 00 ff 
-Err Rate: (0000/0000) - (Cmd:4d) ff f3 5a ff ff ff ff ff ff ff 
-Err Rate: (0000/0000) - (Cmd:4e) ff f3 5a 00 00 00 00 00 00 ff 
-Err Rate: (0335/0000) - (Cmd:4f) ff f3 5a 00 00 00 00 00 00 ff 
+```text
+(Cmd:40) ff f3 5a 00 00 00 00 00 00 ff
+(Cmd:41) ff f3 5a 00 00 00 00 00 00 ff
+(Cmd:42) ff f3 5a 7f ff 7f 7f 7f 7f ff
+(Cmd:43) ff f3 5a 00 00 00 00 00 00 ff
+(Cmd:44) ff f3 5a 00 00 00 00 00 00 ff
+(Cmd:45) ff f3 5a 01 02 00 02 01 00 ff
+(Cmd:46) ff f3 5a 00 00 01 02 00 0a ff
+(Cmd:47) ff f3 5a 00 00 02 00 01 00 ff
+(Cmd:48) ff f3 5a 00 00 00 00 01 00 ff
+(Cmd:49) ff f3 5a 00 00 00 00 00 00 ff
+(Cmd:4a) ff f3 5a 00 00 00 00 00 00 ff
+(Cmd:4b) ff f3 5a 00 00 00 00 00 00 ff
+(Cmd:4c) ff f3 5a 00 00 00 04 00 00 ff
+(Cmd:4d) ff f3 5a ff ff ff ff ff ff ff
+(Cmd:4e) ff f3 5a 00 00 00 00 00 00 ff
+(Cmd:4f) ff f3 5a 00 00 00 00 00 00 ff
 ```
 
 ### DVD Remote Reciever (SCPH-10160)
@@ -200,12 +201,11 @@ Identifier: 0x2
 
 The format looks like this:
 
-```
+```text
 ff 23 5a - ff ff 80 80 80 80
 ```
 
 The first two response bytes are for buttons "A" (bit 4 of byte 1) and "B" (bit 2 of byte 2). The third byte seems to be the acceleration sensed, and the last three return nothing, but I'm expecting it to have been an accelerometer. I've opened it up and there are two metal shields. We'll see what's under those and see if I can fix/replace them.
-
 
 Raw Data
 -------------
@@ -213,7 +213,7 @@ Raw Data
 ### Extended status:
 
 In:  01 45 00 | 5a 5a 5a 5a 5a 5a
-Out: -- f3 5a | XX 02 YY 02 01 00 
+Out: -- f3 5a | XX 02 YY 02 01 00
 
 YY = Analog mode
 
@@ -228,24 +228,22 @@ Controller:
 DVD Remote:
     Didn't respond either
 
-
-
 ### Data Dumps:
 
 #### JogCon
 
-```
-Status:    01 02 01 01 01 00 
-Const 1.1: 00 04 03 01 1e 
-Const 1.2: 00 00 00 00 00 
-Const 2:   00 01 00 00 00 
-Const 3.1: 00 00 04 00 00 
-Const 3.2: 00 00 04 00 00 
+```text
+Status:    01 02 01 01 01 00
+Const 1.1: 00 04 03 01 1e
+Const 1.2: 00 00 00 00 00
+Const 2:   00 01 00 00 00
+Const 3.1: 00 00 04 00 00
+Const 3.2: 00 00 04 00 00
 ```
 
 #### PlayStation DualShock 1:
 
-```
+```text
 Status:    01 02 01 02 01 00
 Const 1.1: 00 01 02 00 0a
 Const 1.2: 00 01 01 01 14
@@ -256,7 +254,7 @@ Const 3.2: 00 00 04 00 00
 
 #### BeamScope Dual Charger (Knockoff DualShock 1):
 
-```
+```text
 Status:    01 02 00 02 01 00
 Const 1.1: 00 01 02 00 0a
 Const 1.2: 00 01 01 01 14
@@ -269,7 +267,7 @@ The fact that Const 2 here is a little off from the official controllers seems t
 
 #### PlayStation DualShock 2:
 
-```
+```text
 Status:    03 02 01 02 01 00
 Const 1.1: 00 01 02 00 0a
 Const 1.2: 00 01 01 01 14
@@ -280,7 +278,7 @@ Const 3.2: 00 00 07 00 00
 
 #### Guitar Hero Controller
 
-```
+```text
 Status:    01 02 01 02 01 00
 Const 1.1: 00 01 02 00 0a
 Const 1.2: 00 01 01 01 14
@@ -291,24 +289,24 @@ Const 3.2: 00 00 07 00 00
 
 #### Controller
 
-```
+```text
 Commands failed
 ```
 
 #### DVD Remote
 
-```
+```text
 Commands failed
 ```
 
 #### DDR Dance Mat
 
-```
+```text
 Commands also failed. :'(
 ```
 
 #### NeGcon (JogCon emulating the NeGcon)
 
-```
+```text
 And more failing
 ```
