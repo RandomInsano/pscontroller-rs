@@ -383,7 +383,7 @@ where
 
         Self {
             dev: spi,
-            select: select,
+            select,
             multitap_port: MultitapPort::A,
         }
     }
@@ -476,22 +476,22 @@ where
         self.send_command(CMD_ENTER_ESCAPE_MODE, &mut buffer)?;
 
         self.send_command(CMD_READ_STATUS, &mut buffer)?;
-        config.status.copy_from_slice(&mut buffer[HEADER_LEN..9]);
+        config.status.copy_from_slice(&buffer[HEADER_LEN..9]);
 
         self.send_command(CMD_READ_CONST1A, &mut buffer)?;
-        config.const1a.copy_from_slice(&mut buffer[4..9]);
+        config.const1a.copy_from_slice(&buffer[4..9]);
 
         self.send_command(CMD_READ_CONST1B, &mut buffer)?;
-        config.const1b.copy_from_slice(&mut buffer[4..9]);
+        config.const1b.copy_from_slice(&buffer[4..9]);
 
         self.send_command(CMD_READ_CONST2, &mut buffer)?;
-        config.const2.copy_from_slice(&mut buffer[4..9]);
+        config.const2.copy_from_slice(&buffer[4..9]);
 
         self.send_command(CMD_READ_CONST3A, &mut buffer)?;
-        config.const3a.copy_from_slice(&mut buffer[4..9]);
+        config.const3a.copy_from_slice(&buffer[4..9]);
 
         self.send_command(CMD_READ_CONST3B, &mut buffer)?;
-        config.const3b.copy_from_slice(&mut buffer[4..9]);
+        config.const3b.copy_from_slice(&buffer[4..9]);
 
         self.send_command(CMD_EXIT_ESCAPE_MODE, &mut buffer)?;
 
@@ -513,7 +513,7 @@ where
         self.send_command(&data, &mut buffer)?;
         data[0 .. MESSAGE_MAX_LENGTH - 3].copy_from_slice(&buffer[HEADER_LEN..]);
 
-        let controller = ControllerData { data: data };
+        let controller = ControllerData { data };
         let device;
 
         unsafe {
