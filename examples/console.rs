@@ -65,8 +65,16 @@ fn main() {
 		println!("");
 		print!("Rate: ({}) - ", rate);
 
+		// Print the three byte header and X * 16bit message
+		let mut c = 3 + (buffer[1] & 0xF) * 2;
 		for item in buffer.iter() {
+			// Only print the number of bytes the controller claims exists
+			if c == 0 {
+				break;
+			}
+
 			print!("{:02x} ", item);
+			c -= 1;
 		}
 
 		if buffer[1] == 0xff {
