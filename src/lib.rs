@@ -153,6 +153,8 @@ pub enum MultitapPort {
     C = 0x03,
     /// The fourth port on the multi-top
     D = 0x04,
+    /// Some unknown id when booting the PS2. Memory card?
+    M = 0x61,
     /// This may be for the multitap itself
     X = 0xff,
 }
