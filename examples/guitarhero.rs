@@ -61,10 +61,11 @@ fn main() {
             controller.buttons.fret_blue(),
             controller.buttons.fret_orange(),            
             controller.buttons.select());
-        println!("SU:{}\tSD:{}\tStar power:{}",
+        println!("SU:{}\tSD:{}\tStar power:{}\tWhammy:{}",
             controller.buttons.strum_up(),
             controller.buttons.strum_down(),
-            controller.buttons.star_power());
+            controller.buttons.star_power(),
+            controller.whammy);
         println!();
     }
 }
