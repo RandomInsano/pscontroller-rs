@@ -9,6 +9,7 @@ So far quite a few devices are supported, and random notes are kept in the `rese
 * DualShock 1/2 analog sticks
 * DualShock 2 pressure sensitive buttons
 * DualShock rumble
+* Guitar Hero controller
 * JogCon
 * JogCon force feedback
 * NegCon
