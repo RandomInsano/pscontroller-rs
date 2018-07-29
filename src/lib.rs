@@ -502,10 +502,7 @@ where
         Ok(config)
     }
 
-    /// Get the raw data from polling for a controller. You can use this to cooerce the data into
-    /// some controller that can't be safely identified by `read_input`, but you should rely on that
-    /// function if you can.
-    pub fn read_raw(&mut self, command: Option<&PollCommand>) -> Result<ControllerData, Error<E>> {
+    fn read_port(&mut self, command: Option<&PollCommand>) -> Result<[u8; MESSAGE_MAX_LENGTH], Error<E>> {
         let mut buffer = [0u8; MESSAGE_MAX_LENGTH];
         let mut data = [0u8; MESSAGE_MAX_LENGTH];
 
@@ -517,7 +514,6 @@ where
         }
 
         self.send_command(&data, &mut buffer)?;
-        data[0 .. MESSAGE_MAX_LENGTH - 3].copy_from_slice(&buffer[HEADER_LEN..]);
 
         // Device polling will return `ACK_BYTE` in the third byte if the command
         // was properly understood
@@ -532,17 +528,36 @@ where
         }
         */
 
-        Ok(ControllerData { data })
+        Ok(buffer)
+    }
+
+    /// Get the raw data from polling for a controller. You can use this to cooerce the data into
+    /// some controller that can't be safely identified by `read_input`, but you should rely on that
+    /// function if you can.
+    pub fn read_raw(&mut self, command: Option<&PollCommand>) -> Result<ControllerData, Error<E>> {
+        let mut buffer = [0u8; MESSAGE_MAX_LENGTH];
+        let data = self.read_port(command)?;
+
+        // Shift the controller data over because we don't need the header anymore
+        buffer[0 .. MESSAGE_MAX_LENGTH - 3].copy_from_slice(&data[HEADER_LEN..]);
+
+        Ok(ControllerData { data: buffer })
     }
 
     /// Ask the controller for input states. Different contoller types will be returned automatically
     /// for you. If you'd like to cooerce a controller yourself, use `read_raw`.
     pub fn read_input(&mut self, command: Option<&PollCommand>) -> Result<Device, Error<E>> {
-        let controller = self.read_raw(command)?;
+        let mut buffer = [0u8; MESSAGE_MAX_LENGTH];
+        let data = self.read_port(command)?;
+
+        // Shift the controller data over because we don't need the header anymore
+        buffer[0 .. MESSAGE_MAX_LENGTH - 3].copy_from_slice(&data[HEADER_LEN..]);
+
+        let controller = ControllerData { data: buffer };
         let device;
 
         unsafe {
-            device = match controller.data[1] {
+            device = match data[1] {
                 CONTROLLER_NOT_PRESENT => Device::None,
                 CONTROLLER_CONFIGURATION => Device::ConfigurationMode,
                 CONTROLLER_CLASSIC => Device::Classic(controller.classic),
