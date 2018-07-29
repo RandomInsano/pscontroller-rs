@@ -51,7 +51,7 @@
 #![feature(untagged_unions)]
 #![no_std]
 #![deny(missing_docs)]
-#![deny(warnings)]
+//#![deny(warnings)]
 #![feature(unsize)]
 
 pub mod classic;
@@ -131,12 +131,14 @@ const CMD_MOTOR_JOGCON: &[u8] = &[0x00, 0x4D, 0x00, 0x00, 0xff, 0xff, 0xff, 0xff
 /// The poll command returns a series of bytes. This union allows us to interact with
 /// those bytes with some functions. It's nice sugar that allows us to use the data
 /// in an obvious way without needing to copy the bytes around
-union ControllerData {
-    data: [u8; MESSAGE_MAX_LENGTH],
+pub union ControllerData {
+    /// The raw data representing the buttons. Kind of unwieldy
+    pub data: [u8; MESSAGE_MAX_LENGTH],
+    /// Maps the underlying bytes to buttons and the whammy bar of the Guitar Hero controller
+    pub gh: GuitarHero,
     classic: Classic,
     ds: DualShock,
     ds2: DualShock2,
-    gh: GuitarHero,
     jc: JogCon,
     nc: NegCon,
 }
@@ -223,7 +225,7 @@ impl GamepadButtons {
     const PS_TRIANGLE: u16 = 0x1000;
     const PS_CIRCLE: u16 = 0x2000;
     const PS_CROSS: u16 = 0x4000;
-    const PS_SQUARE: u16 = 0x8000;    
+    const PS_SQUARE: u16 = 0x8000;
 
     /// A button on the controller
     pub fn select(&self) -> bool {
@@ -500,8 +502,10 @@ where
         Ok(config)
     }
 
-    /// Ask the controller for input states. Different contoller types can be returned.
-    pub fn read_input(&mut self, command: Option<&PollCommand>) -> Result<Device, Error<E>> {
+    /// Get the raw data from polling for a controller. You can use this to cooerce the data into
+    /// some controller that can't be safely identified by `read_input`, but you should rely on that
+    /// function if you can.
+    pub fn read_raw(&mut self, command: Option<&PollCommand>) -> Result<ControllerData, Error<E>> {
         let mut buffer = [0u8; MESSAGE_MAX_LENGTH];
         let mut data = [0u8; MESSAGE_MAX_LENGTH];
 
@@ -515,23 +519,6 @@ where
         self.send_command(&data, &mut buffer)?;
         data[0 .. MESSAGE_MAX_LENGTH - 3].copy_from_slice(&buffer[HEADER_LEN..]);
 
-        let controller = ControllerData { data };
-        let device;
-
-        unsafe {
-            device = match buffer[1] {
-                CONTROLLER_NOT_PRESENT => Device::None,
-                CONTROLLER_CONFIGURATION => Device::ConfigurationMode,
-                CONTROLLER_CLASSIC => Device::Classic(controller.classic),
-                CONTROLLER_DUALSHOCK_DIGITAL => Device::Classic(controller.classic),                
-                CONTROLLER_DUALSHOCK_ANALOG => Device::DualShock(controller.ds),
-                CONTROLLER_DUALSHOCK_PRESSURE => Device::DualShock2(controller.ds2),
-                CONTROLLER_JOGCON => Device::JogCon(controller.jc),
-                CONTROLLER_NEGCON => Device::NegCon(controller.nc),
-                _ => Device::Unknown,
-            }
-        }
-
         // Device polling will return `ACK_BYTE` in the third byte if the command
         // was properly understood
         /*
@@ -544,6 +531,29 @@ where
             }
         }
         */
+
+        Ok(ControllerData { data })
+    }
+
+    /// Ask the controller for input states. Different contoller types will be returned automatically
+    /// for you. If you'd like to cooerce a controller yourself, use `read_raw`.
+    pub fn read_input(&mut self, command: Option<&PollCommand>) -> Result<Device, Error<E>> {
+        let controller = self.read_raw(command)?;
+        let device;
+
+        unsafe {
+            device = match controller.data[1] {
+                CONTROLLER_NOT_PRESENT => Device::None,
+                CONTROLLER_CONFIGURATION => Device::ConfigurationMode,
+                CONTROLLER_CLASSIC => Device::Classic(controller.classic),
+                CONTROLLER_DUALSHOCK_DIGITAL => Device::Classic(controller.classic),                
+                CONTROLLER_DUALSHOCK_ANALOG => Device::DualShock(controller.ds),
+                CONTROLLER_DUALSHOCK_PRESSURE => Device::DualShock2(controller.ds2),
+                CONTROLLER_JOGCON => Device::JogCon(controller.jc),
+                CONTROLLER_NEGCON => Device::NegCon(controller.nc),
+                _ => Device::Unknown,
+            }
+        }
 
         Ok(device)
     }

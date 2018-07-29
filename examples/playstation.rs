@@ -94,9 +94,6 @@ fn main() {
                     x.ry,
                     x.pressures[6]);
             },
-            Device::GuitarHero(x) => {
-                println!("Buttons: {0:08b}, Whammy: {1}", x.buttons, x.whammy)
-            }
             Device::JogCon(x) => {
                 println!("Buttons: {0:08b}, Wheel: {1}", x.buttons.bits(), x.jog_position)
             }
