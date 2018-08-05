@@ -26,5 +26,5 @@ impl GunCon {
     /// Return the Y position of the GunCon's aim on the screen
     pub fn y(&self) -> u16 {
         LittleEndian::read_u16(&self.y)
-    }    
+    }
 }
