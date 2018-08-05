@@ -2,7 +2,10 @@
 //! ============================
 //! A light gun for games like Time Crisis
 
-use byteorder::{ByteOrder, BigEndian, LittleEndian};
+use byteorder::{
+    ByteOrder,
+    LittleEndian
+};
 
 #[repr(C)]
 /// Represents the classic Controller
