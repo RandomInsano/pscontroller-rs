@@ -7,8 +7,6 @@ use byteorder::{ByteOrder, BigEndian, LittleEndian};
 #[repr(C)]
 /// Represents the classic Controller
 pub struct GunCon {
-    // TODO: Check endianness of X and Y
-
     /// Standard buttons (Cross, Circle, L3, Start)
     pub buttons: u16,
     /// Location on screen (left-right)
