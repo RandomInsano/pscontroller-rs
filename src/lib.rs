@@ -58,10 +58,12 @@ pub mod classic;
 pub mod dualshock;
 pub mod negcon;
 pub mod jogcon;
+pub mod guncon;
 pub mod guitarhero;
 
 extern crate bit_reverse;
 extern crate bitflags;
+extern crate byteorder;
 extern crate embedded_hal as hal;
 
 use bit_reverse::ParallelReverse;
@@ -71,7 +73,8 @@ use hal::digital::OutputPin;
 use classic::Classic;
 use dualshock::{DualShock, DualShock2};
 use negcon::NegCon;
-use jogcon::{JogCon};
+use jogcon::JogCon;
+use guncon::GunCon;
 use guitarhero::GuitarHero;
 
 /// The maximum length of a message from a controller
@@ -95,6 +98,8 @@ const CONTROLLER_DUALSHOCK_PRESSURE: u8 = 0x79;
 const CONTROLLER_JOGCON: u8 = 0xe3;
 /// NegCon
 const CONTROLLER_NEGCON: u8 = 0x23;
+/// NegCon
+const CONTROLLER_GUNCON: u8 = 0x63;
 /// Configuration Mode
 const CONTROLLER_CONFIGURATION: u8 = 0xf3;
 
@@ -141,6 +146,7 @@ pub union ControllerData {
     ds2: DualShock2,
     jc: JogCon,
     nc: NegCon,
+    gc: GunCon,
 }
 
 /// The active port to set on the Multitap
@@ -363,6 +369,8 @@ pub enum Device {
     JogCon(JogCon),
     /// The Namco NegCon
     NegCon(NegCon),
+    /// The Namco GunCon
+    GunCon(GunCon),
 }
 
 /// The main event! Create a port using an SPI bus and start commanding
@@ -566,6 +574,7 @@ where
                 CONTROLLER_DUALSHOCK_PRESSURE => Device::DualShock2(controller.ds2),
                 CONTROLLER_JOGCON => Device::JogCon(controller.jc),
                 CONTROLLER_NEGCON => Device::NegCon(controller.nc),
+                CONTROLLER_GUNCON => Device::GunCon(controller.gc),
                 _ => Device::Unknown,
             }
         }

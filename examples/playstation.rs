@@ -100,6 +100,12 @@ fn main() {
             Device::NegCon(x) => {
                 println!("Buttons: {0:08b}, Twist: {1}, I:  {2}", x.buttons.bits(), x.twist, x.switchi)
             }
+            Device::GunCon(x) => {
+                print!("\rButtons: {0:08b}, X:{1} Y:{2}                    ",
+                    x.buttons,
+                    x.x(),
+                    x.y())
+            },
             Device::ConfigurationMode => {
                 println!("Somehow we got stuck where we shouldn't be");
             },
