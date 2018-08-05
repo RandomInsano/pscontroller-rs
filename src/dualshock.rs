@@ -3,9 +3,9 @@
 //! These guys everyone is familiar with, so for now there isn't
 //! much of a description here!
 
+use classic::GamepadButtons;
 use super::{
     HasStandardButtons,
-    GamepadButtons,
     PollCommand
 };
 
