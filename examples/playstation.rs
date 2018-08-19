@@ -95,7 +95,7 @@ fn main() {
                     x.pressures[6]);
             },
             Device::JogCon(x) => {
-                println!("Buttons: {0:08b}, Wheel: {1}", x.buttons.bits(), x.jog_position)
+                println!("Buttons: {0:08b}, Wheel: {1}", x.buttons.bits(), x.jog_position())
             }
             Device::NegCon(x) => {
                 println!("Buttons: {0:08b}, Twist: {1}, I:  {2}", x.buttons.bits(), x.twist, x.switchi)

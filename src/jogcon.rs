@@ -6,6 +6,10 @@
 //! little effort.
 
 use classic::GamepadButtons;
+use byteorder::{
+    ByteOrder,
+    LittleEndian
+};
 use super::{
     HasStandardButtons,
     PollCommand,
@@ -53,10 +57,17 @@ pub struct JogCon {
     pub buttons: GamepadButtons,
 
     /// The absolute position of the jog wheel
-    pub jog_position: i16,
+    jog_position: [u8; 2],
 
     /// What state is the jog wheel in
     pub jog_state: u8,
+}
+
+impl JogCon {
+    /// The absolute position of the jog wheel
+    pub fn jog_position(&self) -> i16 {
+        LittleEndian::read_i16(&self.jog_position)
+    }
 }
 
 impl HasStandardButtons for JogCon {
