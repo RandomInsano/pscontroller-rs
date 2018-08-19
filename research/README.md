@@ -102,6 +102,16 @@ The command byte when the motor is enabled (same as dual shock) seems to be brok
 0xC = Unknown, is followed by 0xff five times, occured once, drive value 0
 ```
 
+### GunCon (SCPH-0034)
+
+Identifier 0x6
+
+No responses for any commands other than polling. The output seems to only the usual 2 bytes for buttons, and there are two 16bit values for X and Y coordinates. X provides a range from around 93 to 455 and Y is a range between 25 to 230.
+
+If the GunCon can't find the screen, it will send out X:10,Y:1 as the read coordinates. Also, it really does need the brightest picture possible to read well. Time Crisis sets the screen to white (in game) or yellow (calibration screen) while reading the GunCon's position to give it the best chance of picking it up.
+
+Reading data up to 100KHz works just fine, but I'm not sure how often to poll is since my test setup was not ideal.
+
 ### DualShock (SCPH-1200)
 
 Identifier 0x7
