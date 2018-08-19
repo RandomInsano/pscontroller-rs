@@ -25,6 +25,7 @@ Richard Davies who created the [PSX Peripheral Bus Library](http://www.debaser.f
 | 5      | SCPH-1110  |            | Analog Joystick - Analog Mode (untested) |
 |        |            | SCPH-1180  | Analog Controller - Analog Green Mode |
 | 6      |            | SLEH-0007  | Namco G-con45 |
+|        |            | SLEH-0034  | Namco GunCon |
 | 7      | SCPH-1150  | SCPH-1200  | Dual Shock Analog Controller - Analog Red Mode |
 |        |            | SCPH-1180  | Analog Controller - Analog Red Mode |
 |        |            | N/A        | RedOctane Guitar Hero Controller |
