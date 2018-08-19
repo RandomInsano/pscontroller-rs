@@ -17,6 +17,7 @@ exclude = [
 embedded-hal = "0.1.2"
 bit_reverse = "0.1.7"
 bitflags = "1.0"
+byteorder = { version = "1.2", default-features = false }
 
 [dev-dependencies]
 linux-embedded-hal = "0.1.1"

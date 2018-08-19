@@ -12,6 +12,7 @@ So far quite a few devices are supported, and random notes are kept in the `rese
 * Guitar Hero controller
 * JogCon
 * JogCon force feedback
+* GunCon
 * NegCon
 * PSX Multitap (SCPH-1070)
 
