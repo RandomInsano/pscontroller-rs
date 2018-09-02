@@ -216,7 +216,7 @@ The format looks like this:
 ff 23 5a - ff ff 80 80 80 80
 ```
 
-The first two response bytes are for buttons "A" (bit 4 of byte 1) and "B" (bit 2 of byte 2). The third byte seems to be the acceleration sensed, and the last three return nothing, but I'm expecting it to have been an accelerometer. I've opened it up and there are two metal shields. We'll see what's under those and see if I can fix/replace them.
+The first two response bytes are for buttons "A" (bit 4 of byte 1) and "B" (bit 6 of byte 2). The third byte seems to be the acceleration sensed, and the last three return nothing, but I'm expecting it to have been an accelerometer. I've opened it up and there are two metal shields. We'll see what's under those and see if I can fix/replace them.
 
 Raw Data
 -------------

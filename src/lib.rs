@@ -60,6 +60,7 @@ pub mod negcon;
 pub mod jogcon;
 pub mod guncon;
 pub mod guitarhero;
+pub mod baton;
 
 extern crate bit_reverse;
 extern crate bitflags;
@@ -76,6 +77,7 @@ use negcon::NegCon;
 use jogcon::JogCon;
 use guncon::GunCon;
 use guitarhero::GuitarHero;
+use baton::Baton;
 
 /// The maximum length of a message from a controller
 const MESSAGE_MAX_LENGTH: usize = 32;
@@ -141,6 +143,8 @@ pub union ControllerData {
     pub data: [u8; MESSAGE_MAX_LENGTH],
     /// Maps the underlying bytes to buttons and the whammy bar of the Guitar Hero controller
     pub gh: GuitarHero,
+    /// Maps the bytes to the Mad Maestro baton
+    pub b: Baton,
     classic: Classic,
     ds: DualShock,
     ds2: DualShock2,
@@ -252,6 +256,8 @@ pub enum Device {
     NegCon(NegCon),
     /// The Namco GunCon
     GunCon(GunCon),
+    /// The Mad Maestro Baton
+    Baton(Baton),
 }
 
 /// The main event! Create a port using an SPI bus and start commanding
