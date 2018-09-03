@@ -10,12 +10,13 @@ So far quite a few devices are supported! Here's the current list:
 * [Controller](https://en.wikipedia.org/wiki/PlayStation_Controller)
 * [Analog Joystick](https://en.wikipedia.org/wiki/PlayStation_Analog_Joystick)
 * [DualShock](https://en.wikipedia.org/wiki/DualShock)
+* [DualShock 2](https://en.wikipedia.org/wiki/DualShock)
 * [JogCon](https://en.wikipedia.org/wiki/Jogcon)
 * [GunCon](https://en.wikipedia.org/wiki/GunCon)
 * [NegCon](https://en.wikipedia.org/wiki/NeGcon)
 * [Multitap](https://en.wikipedia.org/wiki/PlayStation_Multitap)
-* Guitar Hero controller *
 * Maestromusic baton *
+* Guitar Hero controller *
 
 *=Most PlayStation games can assume the type of controller which is plugged in,
 but there are only 16 possible identifiers that can be used. In pracice there is
