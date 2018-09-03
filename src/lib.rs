@@ -90,6 +90,8 @@ const HEADER_LEN: usize = 3;
 const CONTROLLER_NOT_PRESENT: u8 = 0xff;
 /// Original controller, SCPH-1080
 const CONTROLLER_CLASSIC: u8 = 0xc1;
+/// Analog Controller, SCPH-1110 (flightstick looking thing)
+const CONTROLLER_ANALOG_JOYSTICK: u8 = 0x53;
 /// DualShock in Digital mode
 const CONTROLLER_DUALSHOCK_DIGITAL: u8 = 0x41;
 /// DualShock
@@ -242,6 +244,10 @@ pub enum Device {
     /// Original controller that shipped with the PlayStation. Only contains regular
     /// buttons. DualShock 1 and 2 can emulate this mode
     Classic(Classic),
+    /// Sony's strange flight-stick looking thing. Maps to the same data as the
+    /// DualShock 1 but has a different identifier (fun fact: it predates the
+    /// DualShock)
+    AnalogJoystick(DualShock),
     /// Controller with two analog sticks. This was the final controller style shipped with
     /// the original PlayStation
     DualShock(DualShock),
@@ -456,6 +462,7 @@ where
                 CONTROLLER_NOT_PRESENT => Device::None,
                 CONTROLLER_CONFIGURATION => Device::ConfigurationMode,
                 CONTROLLER_CLASSIC => Device::Classic(controller.classic),
+                CONTROLLER_ANALOG_JOYSTICK => Device::AnalogJoystick(controller.ds),
                 CONTROLLER_DUALSHOCK_DIGITAL => Device::Classic(controller.classic),                
                 CONTROLLER_DUALSHOCK_ANALOG => Device::DualShock(controller.ds),
                 CONTROLLER_DUALSHOCK_PRESSURE => Device::DualShock2(controller.ds2),

@@ -8,6 +8,7 @@ main system this library is tested on is a Raspberry Pi 3.
 So far quite a few devices are supported! Here's the current list:
 
 * Original PlayStation digital mode
+* Analog Joystick
 * DualShock 1/2 analog sticks
 * DualShock 2 pressure sensitive buttons
 * DualShock rumble
