@@ -1,10 +1,12 @@
-Hacking Notes
-===============
+# Hacking Notes
 
-Device types
--------------
+## Device types
 
-Richard Davies who created the [PSX Peripheral Bus Library](http://www.debaser.force9.co.uk/psxcn/) over 20 years ago did a fantastic job catalogging controllers from the pre-PS2 era. I'm picking up this torch to fill in the rest, so feel free to reach out if you have some really weird controller device you want to lend me via the powers of UPS or FedEx.
+Richard Davies who created the [PSX Peripheral Bus Library](http://www.debaser.force9.co.uk/psxcn/)
+over 20 years ago did a fantastic job catalogging controllers from the pre-PS2
+era. I'm picking up this torch to fill in the rest, so feel free to reach out if
+you have some really weird controller device you want to lend me via the powers
+of UPS or FedEx.
 
 | Device | JPN P/N    | EU/NA P/N  | Friendly Name    |
 | ------ | ---------- | ---------- | -----------------|
@@ -30,9 +32,8 @@ Richard Davies who created the [PSX Peripheral Bus Library](http://www.debaser.f
 |        |            | SCPH-1180  | Analog Controller - Analog Red Mode |
 |        |            | N/A        | RedOctane Guitar Hero Controller |
 | 9      | SCPH-2000  | N/A        | [Keyboard / Mouse Adapter](http://www.psxdev.net/forum/viewtopic.php?f=54&t=140) |
-| 14     |            | SLEH-0020  | Namco Jogcon |
-| ??     |            | SCPH-10160 | PlayStation 2 DVD Remote |
 | 12     | N/A        | N/A        | This may be a reserved error state |
+| 14     |            | SLEH-0020  | Namco Jogcon |
 
 Notes:
 
@@ -40,8 +41,7 @@ Notes:
 * The device ID is purposely not repeated for readability.
 * Removed the "E" designation from the list official controllers. My guess is that different regions have different letters.
 
-Deep dives into particular devices
------------------------------------
+## Deep dives into particular devices
 
 ### Controller (SCPH-1080)
 
@@ -49,7 +49,7 @@ Original controller without analog sticks.
 
 Identifier: 0xC
 
-Fairly simple controller. While it doesn't have an escape mode it does respond to a fair number of commands more than the newer controllers. 
+Fairly simple controller. While it doesn't have an escape mode it does respond to a fair number of commands more than the newer controllers.
 
 Responses to various commands through `scanner.rs` in the examples:
 
@@ -136,7 +136,6 @@ Responses to various commands through `scanner.rs` in the examples:
 (Cmd:4e) ff f3 5a 00 00 00 00 00 00 ff
 ```
 
-
 ### DualShock 2 (SCPH-10010)
 
 Sony seems to have extended the command a little for this one as there is now the ability to specify the polling response (command 0x4f) and there is also some new stats or constant at command 0xa0.
@@ -218,10 +217,9 @@ ff 23 5a - ff ff 80 80 80 80
 
 The first two response bytes are for buttons "A" (bit 4 of byte 1) and "B" (bit 6 of byte 2). The third byte seems to be the acceleration sensed, and the last three return nothing, but I'm expecting it to have been an accelerometer. I've opened it up and there are two metal shields. We'll see what's under those and see if I can fix/replace them.
 
-Raw Data
--------------
+## Raw Data
 
-### Extended status:
+### Extended status
 
 In:  01 45 00 | 5a 5a 5a 5a 5a 5a
 Out: -- f3 5a | XX 02 YY 02 01 00
@@ -239,9 +237,9 @@ Controller:
 DVD Remote:
     Didn't respond either
 
-### Data Dumps:
+## Data Dumps
 
-#### JogCon
+### JogCon Data
 
 ```text
 Status:    01 02 01 01 01 00
@@ -252,7 +250,7 @@ Const 3.1: 00 00 04 00 00
 Const 3.2: 00 00 04 00 00
 ```
 
-#### PlayStation DualShock 1:
+### PlayStation DualShock 1 Data
 
 ```text
 Status:    01 02 01 02 01 00
@@ -263,7 +261,7 @@ Const 3.1: 00 00 04 00 00
 Const 3.2: 00 00 04 00 00
 ```
 
-#### BeamScope Dual Charger (Knockoff DualShock 1):
+### BeamScope Dual Charger (Knockoff DualShock 1) Data
 
 ```text
 Status:    01 02 00 02 01 00
@@ -276,7 +274,7 @@ Const 3.2: 00 00 04 00 00
 
 The fact that Const 2 here is a little off from the official controllers seems to show that it doesn't matter much.
 
-#### PlayStation DualShock 2:
+### PlayStation DualShock 2 Data
 
 ```text
 Status:    03 02 01 02 01 00
@@ -287,7 +285,7 @@ Const 3.1: 00 00 04 00 00
 Const 3.2: 00 00 07 00 00
 ```
 
-#### Guitar Hero Controller
+### Guitar Hero Controller Data
 
 ```text
 Status:    01 02 01 02 01 00
@@ -298,25 +296,25 @@ Const 3.1: 00 00 04 00 00
 Const 3.2: 00 00 07 00 00
 ```
 
-#### Controller
+### Controller Data
 
 ```text
 Commands failed
 ```
 
-#### DVD Remote
+### DVD Remote Data
 
 ```text
 Commands failed
 ```
 
-#### DDR Dance Mat
+### DDR Dance Mat Data
 
 ```text
 Commands also failed. :'(
 ```
 
-#### NeGcon (JogCon emulating the NeGcon)
+### NeGcon (JogCon emulating the NeGcon) Data
 
 ```text
 And more failing

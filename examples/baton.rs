@@ -16,7 +16,7 @@ use pscontroller_rs::{
 const SPI_DEVICE: &str = "/dev/spidev0.0";
 const SPI_SPEED: u32 = 10_000;
 
-// This will build the 
+// This will build the SPI device communication for us
 fn build_spi() -> io::Result<Spidev> {
 	let mut spi = Spidev::open(SPI_DEVICE)?;
 	let opts = SpidevOptions::new()
@@ -46,9 +46,8 @@ fn main() {
             Ok(x) => x,
         };
 
-        // We can't guess that we have a GuitarHero controller as it
-        // appears nearly the same as a first-generation DualShock, except
-        // for some buttons that are held down which isn't reliable
+        // It's not possible to tell the baton apart from a NeGcon or other
+        // devices that respond as type "0x2", so we have to force it for now.
         unsafe {
             controller = controller_data.b;
         }
