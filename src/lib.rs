@@ -52,6 +52,7 @@
 #![deny(missing_docs)]
 #![deny(warnings)]
 
+pub mod mouse;
 pub mod classic;
 pub mod dualshock;
 pub mod negcon;
@@ -69,6 +70,7 @@ use bit_reverse::ParallelReverse;
 use hal::blocking::spi;
 use hal::digital::OutputPin;
 
+use mouse::Mouse;
 use classic::{Classic, GamepadButtons};
 use dualshock::{DualShock, DualShock2};
 use negcon::NegCon;
@@ -86,6 +88,8 @@ const HEADER_LEN: usize = 3;
 
 /// Controller missing
 const CONTROLLER_NOT_PRESENT: u8 = 0xff;
+/// PlayStation mouse, SCPH-1030
+const CONTROLLER_MOUSE: u8 = 0x12;
 /// Original controller, SCPH-1080
 const CONTROLLER_CLASSIC: u8 = 0xc1;
 /// Analog Controller, SCPH-1110 (flightstick looking thing)
@@ -146,6 +150,7 @@ pub union ControllerData {
     pub gh: GuitarHero,
     /// Maps the bytes to the Mad Maestro baton
     pub b: Baton,
+    pm: Mouse,
     classic: Classic,
     ds: DualShock,
     ds2: DualShock2,
@@ -240,6 +245,8 @@ pub enum Device {
     /// The controller is waiting for configuration data. Users of the library should
     /// never need to see this state.
     ConfigurationMode,
+    /// PlayStation mouse released at launch time with the original PlayStation
+    Mouse(Mouse),
     /// Original controller that shipped with the PlayStation. Only contains regular
     /// buttons. DualShock 1 and 2 can emulate this mode
     Classic(Classic),
@@ -463,6 +470,7 @@ where
             device = match data[1] {
                 CONTROLLER_NOT_PRESENT => Device::None,
                 CONTROLLER_CONFIGURATION => Device::ConfigurationMode,
+                CONTROLLER_MOUSE => Device::Mouse(controller.pm),
                 CONTROLLER_CLASSIC => Device::Classic(controller.classic),
                 CONTROLLER_ANALOG_JOYSTICK => Device::AnalogJoystick(controller.ds),
                 CONTROLLER_DUALSHOCK_DIGITAL => Device::Classic(controller.classic),                

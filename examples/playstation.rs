@@ -70,6 +70,11 @@ fn main() {
             Device::None => {
                 println!("Missing.");
             },
+            Device::Mouse(x) => {
+                println!("Mouse: X:{:02}, Y{:02}",
+                    x.x,
+                    x.y);
+            }
             Device::Classic(x) => {
                 println!("Classic - Start? {0}, Square? {1}",
                     x.buttons.start(),
