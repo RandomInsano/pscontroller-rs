@@ -7,18 +7,15 @@ main system this library is tested on is a Raspberry Pi 3.
 
 So far quite a few devices are supported! Here's the current list:
 
-* Original PlayStation digital mode
-* Analog Joystick
-* DualShock 1/2 analog sticks
-* DualShock 2 pressure sensitive buttons
-* DualShock rumble
+* [Controller](https://en.wikipedia.org/wiki/PlayStation_Controller)
+* [Analog Joystick](https://en.wikipedia.org/wiki/PlayStation_Analog_Joystick)
+* [DualShock](https://en.wikipedia.org/wiki/DualShock)
+* [JogCon](https://en.wikipedia.org/wiki/Jogcon)
+* [GunCon](https://en.wikipedia.org/wiki/GunCon)
+* [NegCon](https://en.wikipedia.org/wiki/NeGcon)
+* [Multitap](https://en.wikipedia.org/wiki/PlayStation_Multitap)
 * Guitar Hero controller *
-* Mad Maestro baton *
-* JogCon
-* JogCon force feedback
-* GunCon
-* NegCon
-* PSX Multitap (SCPH-1070)
+* Maestromusic baton *
 
 *=Most PlayStation games can assume the type of controller which is plugged in,
 but there are only 16 possible identifiers that can be used. In pracice there is
