@@ -164,6 +164,29 @@ Responses to various commands through `scanner.rs` in the examples:
 (Cmd:a0) ff f3 5a 05 01 02 00 00 00 ff
 ```
 
+### No-name Wireless Controller
+
+Available on Amazon for under $20 canadian, it shows some unusual values. Note the `scanner` tool's output has changes some
+
+```text
+Command 40: ff f3 5a 00 00 02 00 00 5a ff 
+Command 41: ff f3 5a ff ff 03 00 00 5a ff 
+Command 42: ff f3 5a ff ff 00 00 00 00 ff 
+Command 43: ff f3 5a 00 00 00 00 00 00 ff 
+Command 44: ff f3 5a 00 00 00 00 00 00 ff 
+Command 45: ff f3 5a 03 02 00 02 01 00 ff 
+Command 46: ff f3 5a 00 00 01 02 00 0a ff 
+Command 47: ff f3 5a 00 00 02 00 01 00 ff 
+Command 48: ff f3 5a 00 00 00 00 01 00 ff 
+Command 49: ff f3 5a 00 00 00 00 00 00 ff 
+Command 4a: ff f3 5a 00 00 00 00 00 00 ff 
+Command 4b: ff f3 5a 00 00 00 00 00 00 ff 
+Command 4c: ff f3 5a 00 00 00 04 00 00 ff 
+Command 4d: ff f3 5a ff ff ff ff ff ff ff 
+Command 4e: ff f3 5a 00 00 00 00 00 00 ff 
+Command 4f: ff f3 5a 00 00 00 00 00 00 ff 
+```
+
 ### Guitar Hero Controller
 
 This responds nearly identically to the DualShock 1, but supports the polling response customization command (0x4f). The buttons, strum, and star power switch all correspond to certain face buttons that I haven't mapped yet. The whammy bar corresponds to one of the analog axis of the DualShock 1.
