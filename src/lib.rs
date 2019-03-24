@@ -51,8 +51,7 @@
 #![feature(untagged_unions)]
 #![no_std]
 #![deny(missing_docs)]
-//#![deny(warnings)]
-#![feature(unsize)]
+#![deny(warnings)]
 
 pub mod classic;
 pub mod dualshock;
