@@ -174,7 +174,7 @@ Responses to various commands through `scanner.rs` in the examples:
 
 ### No-name Wireless Controller
 
-Available on Amazon for under $20 canadian, it shows some unusual values. Note the `scanner` tool's output has changes some
+Available on Amazon for under $20 canadian, it shows some unusual values. Note the `scanner` tool's output has changed some
 
 ```text
 Command 40: ff f3 5a 00 00 02 00 00 5a ff 
