@@ -2,6 +2,9 @@
 //! ============================
 //! These guys everyone is familiar with, so for now there isn't
 //! much of a description here!
+//! 
+//! This also maps for the the Dual Analog (precursor to the Dual Shock) and
+//! the Analog controller (flight stick) as they both have the same buttons
 
 use classic::GamepadButtons;
 use super::{

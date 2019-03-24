@@ -71,7 +71,7 @@ fn main() {
                 println!("Missing.");
             },
             Device::Classic(x) => {
-                println!("Start? {0}, Square? {1}",
+                println!("Classic - Start? {0}, Square? {1}",
                     x.buttons.start(),
                     x.buttons.square());
 
@@ -79,8 +79,16 @@ fn main() {
                     psp.enable_pressure().unwrap();
                 }
             },
+            Device::AnalogJoystick(x) => {
+                println!("Analog - Start? {0} - R:{1:02x},{2:02x}, L:{3:02x},{4:02x}",
+                    x.buttons.start(),
+                    x.rx,
+                    x.ry,
+                    x.lx,
+                    x.ly);
+            },
             Device::DualShock(x) => {
-                println!("Start? {0} - R:{1:02x},{2:02x}, L:{3:02x},{4:02x}", 
+                println!("DualShock - Start? {0} - R:{1:02x},{2:02x}, L:{3:02x},{4:02x}",
                     x.buttons.start(),
                     x.rx,
                     x.ry,
@@ -88,20 +96,20 @@ fn main() {
                     x.ly);
             },
             Device::DualShock2(x) => {
-                println!("Start? {0} - R:{1:02x},{2:02x} - X Pressure:{3:02x}", 
+                println!("DualShock2 - Start? {0} - R:{1:02x},{2:02x} - X Pressure:{3:02x}",
                     x.buttons.start(),
                     x.rx,
                     x.ry,
                     x.pressures[6]);
             },
             Device::JogCon(x) => {
-                println!("Buttons: {0:08b}, Wheel: {1}", x.buttons.bits(), x.jog_position())
+                println!("JogCon - Buttons: {0:08b}, Wheel: {1}", x.buttons.bits(), x.jog_position())
             }
             Device::NegCon(x) => {
-                println!("Buttons: {0:08b}, Twist: {1}, I:  {2}", x.buttons.bits(), x.twist, x.switchi)
+                println!("NegCon- Buttons: {0:08b}, Twist: {1}, I:  {2}", x.buttons.bits(), x.twist, x.switchi)
             }
             Device::GunCon(x) => {
-                print!("\rTrigger: {0}, A: {3}, B:{4}, X:{1} Y:{2}                    ",
+                print!("\rGunCon - Trigger: {0}, A: {3}, B:{4}, X:{1} Y:{2}                    ",
                     x.buttons.trigger(),
                     x.x(),
                     x.y(),
