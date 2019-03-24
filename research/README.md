@@ -55,6 +55,14 @@ Responses to various commands through `scanner.rs` in the examples:
 
 (Need to dump this)
 
+### Dual Analog (SCPH-1180)
+
+Second controller *with* analog sticks.
+
+Identifier: 0x5 (when emulating the Analog Joystick)
+
+This doesn't seem to contain the same smarts as the Dual Shock below. I'm not able to force the Analog mode and it doesn't respond to any of the advanced commands.
+
 ### JogCon
 
 Namco's force-feedback handheld controller
@@ -341,4 +349,10 @@ Commands also failed. :'(
 
 ```text
 And more failing
+```
+
+### Analog Controller
+
+```text
+Yeah, here too
 ```
