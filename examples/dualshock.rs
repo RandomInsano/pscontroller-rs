@@ -9,11 +9,9 @@ use linux_hal::Pin;
 
 use pscontroller_rs::{
     PlayStationPort,
-    GamepadButtons,
     Device,
-    dualshock::{
-        ControlDS
-    }
+    classic::GamepadButtons,
+    dualshock::ControlDS
 };
 
 // Specific to the host device used on Linux, you'll have to change the following
@@ -75,7 +73,7 @@ fn main() {
         };
 
         match controller {
-            Device::DualShock(x) => {
+            Device::DualShock(x) | Device::AnalogJoystick(x) => {
                 println!("DualShock:   Start? {0} - R:{1:02x},{2:02x}, L:{3:02x},{4:02x}", 
                     x.buttons.start(),
                     x.rx,
