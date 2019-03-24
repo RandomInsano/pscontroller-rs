@@ -10,7 +10,7 @@ use byteorder::{
 /// The buttons found on the generation 1 GunCon. Once I find a GC2
 /// I'll fill this out better
 #[repr(C)]
-#[derive(Clone)]
+#[derive(Copy, Clone)]
 pub struct GunconButtons {
     data: u16
 }
@@ -37,6 +37,7 @@ impl GunconButtons {
 }
 
 #[repr(C)]
+#[derive(Copy, Clone)]
 /// Represents the classic Controller
 pub struct GunCon {
     /// Standard buttons (Cross, Circle, L3, Start)

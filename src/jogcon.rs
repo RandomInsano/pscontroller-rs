@@ -48,6 +48,7 @@ pub enum JogState {
 }
 
 #[repr(C)]
+#[derive(Copy, Clone)]
 /// Represents the Namco JogCon controller
 pub struct JogCon {
     // TODO: Implement an endian-safe accessor for jog_position

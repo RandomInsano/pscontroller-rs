@@ -7,7 +7,7 @@ use super::HasStandardButtons;
 
 /// The digital buttons of the gamepad
 #[repr(C)]
-#[derive(Clone)]
+#[derive(Copy, Clone)]
 pub struct GamepadButtons {
     data: u16,
 }
@@ -125,6 +125,7 @@ impl GamepadButtons {
 }
 
 #[repr(C)]
+#[derive(Copy, Clone)]
 /// Represents the classic Controller
 pub struct Classic {
     /// Standard buttons (Cross, Circle, L3, Start)

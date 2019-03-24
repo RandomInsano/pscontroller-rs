@@ -48,7 +48,6 @@
 //! * [Simulated PS2 Controller for Autonomously playing Guitar Hero](http://procrastineering.blogspot.ca/2010/12/simulated-ps2-controller-for.html) - SPI protocol captures
 
 
-#![feature(untagged_unions)]
 #![no_std]
 #![deny(missing_docs)]
 #![deny(warnings)]
@@ -136,6 +135,7 @@ const CMD_MOTOR_DUALSHOCK: &[u8] = &[0x00, 0x4D, 0x00, 0x00, 0x01, 0xff, 0xff, 0
 const CMD_MOTOR_JOGCON: &[u8] = &[0x00, 0x4D, 0x00, 0x00, 0xff, 0xff, 0xff, 0xff, 0xff];
 
 #[repr(C)]
+#[derive(Copy, Clone)]
 /// The poll command returns a series of bytes. This union allows us to interact with
 /// those bytes with some functions. It's nice sugar that allows us to use the data
 /// in an obvious way without needing to copy the bytes around
@@ -440,6 +440,9 @@ where
 
         // Shift the controller data over because we don't need the header anymore
         buffer[0 .. MESSAGE_MAX_LENGTH - 3].copy_from_slice(&data[HEADER_LEN..]);
+
+        // FIXME: This doesn't zero out the end so we could theoretically have
+        //        repeated data
 
         Ok(ControllerData { data: buffer })
     }

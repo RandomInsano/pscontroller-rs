@@ -13,6 +13,7 @@ use super::{
 };
 
 #[repr(C)]
+#[derive(Copy, Clone)]
 /// Represents the DualShock 1 controller
 pub struct DualShock {
     /// Standard buttons (Cross, Circle, L3, Start, etc)
@@ -35,6 +36,7 @@ impl HasStandardButtons for DualShock {
 }
 
 #[repr(C)]
+#[derive(Copy, Clone)]
 /// Represents the DualShock 2 controller
 pub struct DualShock2 {
     /// Standard buttons (Cross, Circle, L3, Start, etc)
