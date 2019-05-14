@@ -12,7 +12,7 @@ use pscontroller_rs::{PlayStationPort, Device};
 // Specific to the host device used on Linux, you'll have to change the following
 // parameters depending on your board and also export and allow writing to the GPIO
 const SPI_DEVICE: &str = "/dev/spidev0.0";
-const SPI_SPEED: u32 = 10_000;
+const SPI_SPEED: u32 = 100_000;
 
 // This will build the 
 fn build_spi() -> io::Result<Spidev> {
@@ -71,9 +71,11 @@ fn main() {
                 println!("Missing.");
             },
             Device::Mouse(x) => {
-                println!("Mouse: X:{:02}, Y{:02}",
+                println!("Mouse: X:{:02}, Y{:02}, L:{}, R:{}",
                     x.x,
-                    x.y);
+                    x.y,
+                    x.buttons.left(),
+                    x.buttons.right());
             }
             Device::Classic(x) => {
                 println!("Classic - Start? {0}, Square? {1}",

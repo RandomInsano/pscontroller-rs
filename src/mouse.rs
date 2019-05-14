@@ -12,8 +12,8 @@ pub struct MouseButtons {
 }
 
 impl MouseButtons {
-    const PM_L: u16 = 0x0400;
-    const PM_R: u16 = 0x0800;
+    const PM_L: u16 = 0x0800;
+    const PM_R: u16 = 0x0400;
 
     /// A button on the controller
     pub fn left(&self) -> bool {
