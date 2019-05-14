@@ -67,6 +67,7 @@ extern crate byteorder;
 extern crate embedded_hal as hal;
 
 use bit_reverse::ParallelReverse;
+use core::fmt;
 use hal::blocking::spi;
 use hal::digital::OutputPin;
 
@@ -190,6 +191,12 @@ pub enum Error<E> {
 impl<E> From<E> for Error<E> {
     fn from(e: E) -> Self {
         Error::Spi(e)
+    }
+}
+
+impl<E> fmt::Debug for Error<E> {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f, "Error")
     }
 }
 
