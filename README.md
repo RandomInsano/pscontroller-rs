@@ -14,6 +14,7 @@ So far quite a few devices are supported! Here's the current list:
 * [JogCon](https://en.wikipedia.org/wiki/Jogcon)
 * [GunCon](https://en.wikipedia.org/wiki/GunCon)
 * [NegCon](https://en.wikipedia.org/wiki/NeGcon)
+* [Mouse](https://en.wikipedia.org/wiki/PlayStation_Mouse)
 * [Multitap](https://en.wikipedia.org/wiki/PlayStation_Multitap)
 * Maestromusic baton *
 * Guitar Hero controller *
