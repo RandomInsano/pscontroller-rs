@@ -68,7 +68,7 @@ extern crate embedded_hal as hal;
 use bit_reverse::ParallelReverse;
 use core::fmt;
 use hal::blocking::spi;
-use hal::digital::v2::OutputPin;
+use hal::digital::v1::OutputPin;
 
 use mouse::Mouse;
 use classic::{Classic, GamepadButtons};
@@ -289,14 +289,14 @@ pub struct PlayStationPort<SPI, CS> {
 impl<E, SPI, CS> PlayStationPort<SPI, CS>
 where
     SPI: spi::Transfer<u8, Error = E>,
-    CS: OutputPin<Error = E> {
+    CS: OutputPin {
 
     /// Create a new device to talk over the PlayStation's controller
     /// port
     pub fn new(spi: SPI, mut select: Option<CS>) -> Self {
         // If a select pin was provided, disable the controller for now
         if let Some(ref mut x) = select {
-            let _ = x.set_high();
+            x.set_high();
         }
 
         Self {
@@ -330,13 +330,13 @@ where
         Self::flip(result);
 
         if let Some(ref mut x) = self.select {
-            x.set_low()?;
+            x.set_low();
         }
 
         self.dev.transfer(result)?;
 
         if let Some(ref mut x) = self.select {
-            x.set_high()?;
+            x.set_high();
         }
 
         Self::flip(result);
