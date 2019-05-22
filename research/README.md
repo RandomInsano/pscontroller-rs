@@ -327,6 +327,17 @@ Const 3.1: 00 00 04 00 00
 Const 3.2: 00 00 07 00 00
 ```
 
+### Wai Wai Jansou Data
+
+```
+Status:    01 02 01 02 01 00 
+Const 1.1: 00 01 02 00 00 
+Const 1.2: 00 01 01 01 00 
+Const 2:   00 02 00 01 00 
+Const 3.1: 00 00 04 00 00 
+Const 3.2: 00 00 04 00 00 
+```
+
 ### Controller Data
 
 ```text
