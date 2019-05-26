@@ -14,7 +14,7 @@ exclude = [
 ]
 
 [dependencies]
-embedded-hal = "0.2.2"
+embedded-hal = "=0.2.2"
 bit_reverse = { version = "0.1.7", default-features = false }
 bitflags = "1.0"
 byteorder = { version = "1.2", default-features = false }

@@ -68,7 +68,7 @@ extern crate embedded_hal as hal;
 use bit_reverse::ParallelReverse;
 use core::fmt;
 use hal::blocking::spi;
-use hal::digital::v1::OutputPin;
+use hal::digital::OutputPin;
 
 use mouse::Mouse;
 use classic::{Classic, GamepadButtons};
