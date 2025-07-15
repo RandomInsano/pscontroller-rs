@@ -31,7 +31,7 @@ pub struct DualShock {
 
 impl HasStandardButtons for DualShock {
     fn buttons(&self) -> GamepadButtons {
-        self.buttons.clone()
+        self.buttons
     }
 }
 
@@ -58,7 +58,7 @@ pub struct DualShock2 {
 
 impl HasStandardButtons for DualShock2 {
     fn buttons(&self) -> GamepadButtons {
-        self.buttons.clone()
+        self.buttons
     }
 }
 

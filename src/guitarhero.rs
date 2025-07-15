@@ -95,6 +95,6 @@ pub struct GuitarHero {
 impl GuitarHero {
     /// Get a copy of the buttons that were pressed
     pub fn buttons(&self) -> GuitarButtons {
-        self.buttons.clone()
+        self.buttons
     }
 }

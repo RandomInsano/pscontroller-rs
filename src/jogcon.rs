@@ -73,7 +73,7 @@ impl JogCon {
 
 impl HasStandardButtons for JogCon {
     fn buttons(&self) -> GamepadButtons {
-        self.buttons.clone()
+        self.buttons
     }
 }
 
