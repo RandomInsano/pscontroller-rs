@@ -6,7 +6,7 @@
 //! This also maps for the the Dual Analog (precursor to the Dual Shock) and
 //! the Analog controller (flight stick) as they both have the same buttons
 
-use classic::GamepadButtons;
+use crate::classic::GamepadButtons;
 use super::{
     HasStandardButtons,
     PollCommand
@@ -31,7 +31,7 @@ pub struct DualShock {
 
 impl HasStandardButtons for DualShock {
     fn buttons(&self) -> GamepadButtons {
-        self.buttons.clone()
+        self.buttons
     }
 }
 
@@ -58,7 +58,7 @@ pub struct DualShock2 {
 
 impl HasStandardButtons for DualShock2 {
     fn buttons(&self) -> GamepadButtons {
-        self.buttons.clone()
+        self.buttons
     }
 }
 
@@ -75,8 +75,8 @@ impl ControlDS {
     /// Create a new one of thes newfangled control commands
     pub fn new(little: bool, big: u8) -> Self {
         Self {
-            little: little,
-            big: big,
+            little,
+            big,
         }
     }
 }

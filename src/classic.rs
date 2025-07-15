@@ -134,6 +134,6 @@ pub struct Classic {
 
 impl HasStandardButtons for Classic {
     fn buttons(&self) -> GamepadButtons {
-        self.buttons.clone()
+        self.buttons
     }
 }

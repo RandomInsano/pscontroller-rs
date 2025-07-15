@@ -5,7 +5,7 @@
 //! but it is featureful enough that it can be treated as a servo motor with
 //! little effort.
 
-use classic::GamepadButtons;
+use crate::classic::GamepadButtons;
 use byteorder::{
     ByteOrder,
     LittleEndian
@@ -73,7 +73,7 @@ impl JogCon {
 
 impl HasStandardButtons for JogCon {
     fn buttons(&self) -> GamepadButtons {
-        self.buttons.clone()
+        self.buttons
     }
 }
 
@@ -89,8 +89,8 @@ impl ControlJC {
     /// Create a new one of thes newfangled control commands
     pub fn new(mode: JogControl, strength: u8) -> Self {
         Self {
-            mode: mode,
-            strength: strength,
+            mode,
+            strength,
         }
     }
 }
