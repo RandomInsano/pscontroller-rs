@@ -5,7 +5,7 @@
 //! but it is featureful enough that it can be treated as a servo motor with
 //! little effort.
 
-use classic::GamepadButtons;
+use crate::classic::GamepadButtons;
 use byteorder::{
     ByteOrder,
     LittleEndian

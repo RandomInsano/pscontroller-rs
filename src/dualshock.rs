@@ -6,7 +6,7 @@
 //! This also maps for the the Dual Analog (precursor to the Dual Shock) and
 //! the Analog controller (flight stick) as they both have the same buttons
 
-use classic::GamepadButtons;
+use crate::classic::GamepadButtons;
 use super::{
     HasStandardButtons,
     PollCommand
