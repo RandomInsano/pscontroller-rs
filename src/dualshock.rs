@@ -75,8 +75,8 @@ impl ControlDS {
     /// Create a new one of thes newfangled control commands
     pub fn new(little: bool, big: u8) -> Self {
         Self {
-            little: little,
-            big: big,
+            little,
+            big,
         }
     }
 }

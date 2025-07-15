@@ -89,8 +89,8 @@ impl ControlJC {
     /// Create a new one of thes newfangled control commands
     pub fn new(mode: JogControl, strength: u8) -> Self {
         Self {
-            mode: mode,
-            strength: strength,
+            mode,
+            strength,
         }
     }
 }
