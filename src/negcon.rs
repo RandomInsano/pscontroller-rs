@@ -3,7 +3,7 @@
 //! A controller with twist! This controller has multiple analog buttons and twists in
 //! the center. It doesn't follow the normal PlayStation button scheme, so it has its
 //! own button helper struct to work through the buttons
-//! 
+//!
 //! Testing
 //! ------------
 //! Testing for this module was done on a JogCon controller running in NeGcon
@@ -31,7 +31,6 @@ impl NegconButtons {
     const NC_R: u16 = 0x0800;
     const NC_B: u16 = 0x1000;
     const NC_A: u16 = 0x2000;
-
 
     /// A button on the controller
     pub fn select(&self) -> bool {
@@ -102,6 +101,5 @@ pub struct NegCon {
     pub switchii: u8,
 
     /// Position of switch L
-    pub switchl: u8
+    pub switchl: u8,
 }
-

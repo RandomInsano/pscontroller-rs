@@ -2,15 +2,12 @@
 //! ============================
 //! These guys everyone is familiar with, so for now there isn't
 //! much of a description here!
-//! 
+//!
 //! This also maps for the the Dual Analog (precursor to the Dual Shock) and
 //! the Analog controller (flight stick) as they both have the same buttons
 
+use super::{HasStandardButtons, PollCommand};
 use crate::classic::GamepadButtons;
-use super::{
-    HasStandardButtons,
-    PollCommand
-};
 
 #[repr(C)]
 #[derive(Copy, Clone)]
@@ -74,10 +71,7 @@ pub struct ControlDS {
 impl ControlDS {
     /// Create a new one of thes newfangled control commands
     pub fn new(little: bool, big: u8) -> Self {
-        Self {
-            little,
-            big,
-        }
+        Self { little, big }
     }
 }
 

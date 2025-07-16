@@ -1,15 +1,13 @@
-extern crate linux_embedded_hal as linux_hal;
 extern crate bit_reverse;
+extern crate linux_embedded_hal as linux_hal;
 extern crate pscontroller_rs;
 
-use std::io;
-use linux_hal::Spidev;
 use linux_hal::spidev::{SpidevOptions, SPI_MODE_3};
 use linux_hal::Pin;
+use linux_hal::Spidev;
+use std::io;
 
-use pscontroller_rs::{
-    PlayStationPort,
-};
+use pscontroller_rs::PlayStationPort;
 
 // Specific to the host device used on Linux, you'll have to change the following
 // parameters depending on your board and also export and allow writing to the GPIO
@@ -18,15 +16,15 @@ const SPI_SPEED: u32 = 10_000;
 
 // This will build the SPI device communication for us
 fn build_spi() -> io::Result<Spidev> {
-	let mut spi = Spidev::open(SPI_DEVICE)?;
-	let opts = SpidevOptions::new()
-		.bits_per_word(8)
-		.max_speed_hz(SPI_SPEED)
-		.mode(SPI_MODE_3)
-		.build();
-	spi.configure(&opts)?;
+    let mut spi = Spidev::open(SPI_DEVICE)?;
+    let opts = SpidevOptions::new()
+        .bits_per_word(8)
+        .max_speed_hz(SPI_SPEED)
+        .mode(SPI_MODE_3)
+        .build();
+    spi.configure(&opts)?;
 
-	Ok(spi)
+    Ok(spi)
 }
 
 fn main() {
@@ -42,7 +40,7 @@ fn main() {
             Err(_) => {
                 print!("\rError reading controller");
                 continue;
-            },
+            }
             Ok(x) => x,
         };
 
@@ -52,12 +50,14 @@ fn main() {
             controller = controller_data.b;
         }
 
-        println!("\rA:{}, B:{} - Z: {:03} X: {:03} Y: {:03} A: {:03}",
+        println!(
+            "\rA:{}, B:{} - Z: {:03} X: {:03} Y: {:03} A: {:03}",
             controller.buttons.a(),
             controller.buttons.b(),
             controller.z,
             controller.x,
             controller.y,
-            controller.a);
+            controller.a
+        );
     }
 }

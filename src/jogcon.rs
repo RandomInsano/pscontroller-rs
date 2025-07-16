@@ -5,15 +5,9 @@
 //! but it is featureful enough that it can be treated as a servo motor with
 //! little effort.
 
+use super::{HasStandardButtons, PollCommand};
 use crate::classic::GamepadButtons;
-use byteorder::{
-    ByteOrder,
-    LittleEndian
-};
-use super::{
-    HasStandardButtons,
-    PollCommand,
-};
+use byteorder::{ByteOrder, LittleEndian};
 
 /// What we want the JogCon's wheel to do after we
 /// poll it
@@ -44,7 +38,7 @@ pub enum JogState {
     /// The wheel was turned right
     TurnedRight,
     /// The wheel met its maximum recordable distance
-    AtMaximum
+    AtMaximum,
 }
 
 #[repr(C)]
@@ -53,7 +47,6 @@ pub enum JogState {
 pub struct JogCon {
     // TODO: Implement an endian-safe accessor for jog_position
     // TODO: Implement an enum accessor for jog_state
-
     /// Standard buttons (Cross, Circle, L3, Start, etc)
     pub buttons: GamepadButtons,
 
@@ -80,18 +73,15 @@ impl HasStandardButtons for JogCon {
 /// Command for controlling the wheel on the JogCon
 pub struct ControlJC {
     /// The mode the wheel should be in (move left, move right, etc)
-	pub mode: JogControl,
+    pub mode: JogControl,
     /// How strong the motor should be working
-	pub strength: u8,
+    pub strength: u8,
 }
 
 impl ControlJC {
     /// Create a new one of thes newfangled control commands
     pub fn new(mode: JogControl, strength: u8) -> Self {
-        Self {
-            mode,
-            strength,
-        }
+        Self { mode, strength }
     }
 }
 
