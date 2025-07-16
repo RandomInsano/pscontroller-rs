@@ -1,64 +1,63 @@
 //! Playstation Controller driver for Rust's [Embedded Hardware Abstraction Layer](https://github.com/japaric/embedded-hal)
 //! ============================
-//! 
+//!
 //! The original PlayStation and most of its peripherals are 20+ years old at this point,
 //! but they're easy to interface with for fun projects and wireless variants are easy
 //! to come by while being [pretty cheap](https://www.amazon.ca/s/?ie=UTF8&keywords=ps2+wireless+controller)
 //! ($28 Canadian for two as of this writing).
-//! 
+//!
 //! The current state of this library is such that it's pretty naïve to which controller
 //! is plugged in, and it will make a guess based on the response to a poll request. The
 //! response is broken into a header with an identification byte and an acknowledge byte and
 //! we use the whole identification byte and just assume the data its sending is correct.
-//! 
+//!
 //! If you own something particularly interesting for the PS1 or PS2 that plugs into the
 //! controller port and isn't supported here, feel free to reach out by creating an issue
 //! and we can work out some creative way to get the device working with this library.
-//! 
+//!
 //! Efficiencies can be made here, and things will likely improve, but the darn thing is
 //! useful now so let's start using it! If you find things to fix, please make an issue.
-//! 
+//!
 //! Hardware
 //! -----------------------
-//! 
+//!
 //! Because the PlayStation can have up to four devices sharing the same SPI bus (two
 //! controllers and two memory cards), they made the data out (MISO) pin open drain. That
 //! means that it can only pull the line low and you'll need to add your own resistor
 //! connected from that pin to +5v. In my testing with a voltage divider on a PlayStation 2,
 //! the value is between 220 and 500 ohms.
-//! 
+//!
 //! Development and testing is recommended to by done on a Raspberry Pi as it has a reliable
 //! SPI bus. Early testing on both a Next Thing Co. C.H.I.P. and an Odroid C1+ didn't go
 //! very well. The C.H.I.P. added unexpected clock changes, and the C1+ had voltage pull
 //! up/down problems with the data lines.
-//! 
+//!
 //! The controller itself is a 3.3v logic device and any force feedback is meant to be
 //! driven by the 7.5v cd-rom voltage. Testing using the 5v line on of the Raspberry Pi
 //! technically works, but the result is much weaker than the original console.
-//! 
+//!
 //! Bibliography
 //! -----------------------
 //! Here is the list of the great bits of documentation that helped get this project started
 //! and continue to provide a good cross-reference to double check the work done here.
-//! 
+//!
 //! * [psxpad.html](http://domisan.sakura.ne.jp/article/psxpad/psxpad.html) - Wiring, testing and bootstrapping game pad on Linux with SPI
 //! * [ps_eng.txt](http://kaele.com/~kashima/games/ps_eng.txt) - Controller / Memory Card Protocols (pre-DualShock)
 //! * [Playstation 2 (Dual Shock) controller protocol notes](https://gist.github.com/scanlime/5042071) - Command protocols
 //! * [psxpblib](http://www.debaser.force9.co.uk/psxpblib/) - Interfacing PlayStation controllers via the parallel port
 //! * [Simulated PS2 Controller for Autonomously playing Guitar Hero](http://procrastineering.blogspot.ca/2010/12/simulated-ps2-controller-for.html) - SPI protocol captures
 
-
 #![no_std]
 #![deny(missing_docs)]
 
-pub mod mouse;
+pub mod baton;
 pub mod classic;
 pub mod dualshock;
-pub mod negcon;
-pub mod jogcon;
-pub mod guncon;
 pub mod guitarhero;
-pub mod baton;
+pub mod guncon;
+pub mod jogcon;
+pub mod mouse;
+pub mod negcon;
 
 extern crate bit_reverse;
 extern crate bitflags;
@@ -70,14 +69,14 @@ use core::fmt;
 use hal::blocking::spi;
 use hal::digital::OutputPin;
 
-use mouse::Mouse;
+use baton::Baton;
 use classic::{Classic, GamepadButtons};
 use dualshock::{DualShock, DualShock2};
-use negcon::NegCon;
-use jogcon::JogCon;
-use guncon::GunCon;
 use guitarhero::GuitarHero;
-use baton::Baton;
+use guncon::GunCon;
+use jogcon::JogCon;
+use mouse::Mouse;
+use negcon::NegCon;
 
 /// The maximum length of a message from a controller
 const MESSAGE_MAX_LENGTH: usize = 32;
@@ -237,7 +236,7 @@ pub struct ControllerConfiguration {
 /// Possible devices that can be returned by the poll command to the controller.
 /// Currently, we're relying both on the device type (high nybble) and the number
 /// of 16bit words its returning (low nybble) to guess the device type.
-/// 
+///
 /// While that's not ideal, I haven't found a better way to do this yet. It seems
 /// as though the constants to define devices rarely change so for example, the
 /// Guitar Hero controller reports in every way that it is a DualShock 1 controller.
@@ -289,8 +288,8 @@ pub struct PlayStationPort<SPI, CS> {
 impl<E, SPI, CS> PlayStationPort<SPI, CS>
 where
     SPI: spi::Transfer<u8, Error = E>,
-    CS: OutputPin {
-
+    CS: OutputPin,
+{
     /// Create a new device to talk over the PlayStation's controller
     /// port
     pub fn new(spi: SPI, mut select: Option<CS>) -> Self {
@@ -308,8 +307,8 @@ where
 
     fn flip(bytes: &mut [u8]) {
         for byte in bytes.iter_mut() {
-		    *byte = byte.swap_bits();
-	    }
+            *byte = byte.swap_bits();
+        }
     }
 
     /// Set the active port on the multi-tap. If no tap is being used, anything
@@ -366,7 +365,7 @@ where
     }
 
     /// Configure the JogCon for wheel control.
-    /// 
+    ///
     /// If no digital buttons are pressed in this mode for 60 seconds, the
     /// JogCon will go to sleep until buttons are pressed. If no polling is
     /// done for 10 seconds, it will drop out of this mode and revert to
@@ -416,7 +415,10 @@ where
         Ok(config)
     }
 
-    fn read_port(&mut self, command: Option<&dyn PollCommand>) -> Result<[u8; MESSAGE_MAX_LENGTH], Error<E>> {
+    fn read_port(
+        &mut self,
+        command: Option<&dyn PollCommand>,
+    ) -> Result<[u8; MESSAGE_MAX_LENGTH], Error<E>> {
         let mut buffer = [0u8; MESSAGE_MAX_LENGTH];
         let mut data = [0u8; MESSAGE_MAX_LENGTH];
 
@@ -448,12 +450,15 @@ where
     /// Get the raw data from polling for a controller. You can use this to cooerce the data into
     /// some controller that can't be safely identified by `read_input`, but you should rely on that
     /// function if you can.
-    pub fn read_raw(&mut self, command: Option<&dyn PollCommand>) -> Result<ControllerData, Error<E>> {
+    pub fn read_raw(
+        &mut self,
+        command: Option<&dyn PollCommand>,
+    ) -> Result<ControllerData, Error<E>> {
         let mut buffer = [0u8; MESSAGE_MAX_LENGTH];
         let data = self.read_port(command)?;
 
         // Shift the controller data over because we don't need the header anymore
-        buffer[0 .. MESSAGE_MAX_LENGTH - 3].copy_from_slice(&data[HEADER_LEN..]);
+        buffer[0..MESSAGE_MAX_LENGTH - 3].copy_from_slice(&data[HEADER_LEN..]);
 
         // FIXME: This doesn't zero out the end so we could theoretically have
         //        repeated data
@@ -468,7 +473,7 @@ where
         let data = self.read_port(command)?;
 
         // Shift the controller data over because we don't need the header anymore
-        buffer[0 .. MESSAGE_MAX_LENGTH - 3].copy_from_slice(&data[HEADER_LEN..]);
+        buffer[0..MESSAGE_MAX_LENGTH - 3].copy_from_slice(&data[HEADER_LEN..]);
 
         let controller = ControllerData { data: buffer };
         let device;
@@ -480,7 +485,7 @@ where
                 CONTROLLER_MOUSE => Device::Mouse(controller.pm),
                 CONTROLLER_CLASSIC => Device::Classic(controller.classic),
                 CONTROLLER_ANALOG_JOYSTICK => Device::AnalogJoystick(controller.ds),
-                CONTROLLER_DUALSHOCK_DIGITAL => Device::Classic(controller.classic),                
+                CONTROLLER_DUALSHOCK_DIGITAL => Device::Classic(controller.classic),
                 CONTROLLER_DUALSHOCK_ANALOG => Device::DualShock(controller.ds),
                 CONTROLLER_DUALSHOCK_PRESSURE => Device::DualShock2(controller.ds2),
                 CONTROLLER_JOGCON => Device::JogCon(controller.jc),
@@ -499,14 +504,7 @@ mod tests {
     fn union_test() {
         // Again, buttons are active low, hence 'fe' and '7f'
         let controller = ControllerData {
-            data: [
-                0xfe,
-                0x7f,
-                0x00,
-                0x00,
-                0x00,
-                0xff
-            ],
+            data: [0xfe, 0x7f, 0x00, 0x00, 0x00, 0xff],
         };
 
         unsafe {

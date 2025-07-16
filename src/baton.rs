@@ -7,7 +7,7 @@
 #[repr(C)]
 #[derive(Copy, Clone)]
 pub struct BatonButtons {
-    data: u16
+    data: u16,
 }
 
 impl BatonButtons {
@@ -38,5 +38,5 @@ pub struct Baton {
     /// Unknown, assuming acceleration
     pub y: u8,
     /// Unknown, assuming acceleration
-    pub a: u8
+    pub a: u8,
 }

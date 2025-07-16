@@ -9,7 +9,7 @@
 #[repr(C)]
 #[derive(Copy, Clone)]
 pub struct GuitarButtons {
-    data: u16
+    data: u16,
 }
 
 impl GuitarButtons {

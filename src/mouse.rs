@@ -8,7 +8,7 @@
 #[repr(C)]
 #[derive(Copy, Clone)]
 pub struct MouseButtons {
-    data: u16
+    data: u16,
 }
 
 impl MouseButtons {

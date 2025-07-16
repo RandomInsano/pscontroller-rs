@@ -1,35 +1,30 @@
-extern crate linux_embedded_hal as linux_hal;
 extern crate bit_reverse;
+extern crate linux_embedded_hal as linux_hal;
 extern crate pscontroller_rs;
 
-use std::io;
-use linux_hal::Spidev;
 use linux_hal::spidev::{SpidevOptions, SPI_MODE_3};
 use linux_hal::Pin;
+use linux_hal::Spidev;
+use std::io;
 
-use pscontroller_rs::{
-    PlayStationPort,
-    Device,
-    classic::GamepadButtons,
-    dualshock::ControlDS
-};
+use pscontroller_rs::{classic::GamepadButtons, dualshock::ControlDS, Device, PlayStationPort};
 
 // Specific to the host device used on Linux, you'll have to change the following
 // parameters depending on your board and also export and allow writing to the GPIO
 const SPI_DEVICE: &str = "/dev/spidev0.0";
 const SPI_SPEED: u32 = 10_000;
 
-// This will build the 
+// This will build the
 fn build_spi() -> io::Result<Spidev> {
-	let mut spi = Spidev::open(SPI_DEVICE)?;
-	let opts = SpidevOptions::new()
-		.bits_per_word(8)
-		.max_speed_hz(SPI_SPEED)
-		.mode(SPI_MODE_3)
-		.build();
-	spi.configure(&opts)?;
+    let mut spi = Spidev::open(SPI_DEVICE)?;
+    let opts = SpidevOptions::new()
+        .bits_per_word(8)
+        .max_speed_hz(SPI_SPEED)
+        .mode(SPI_MODE_3)
+        .build();
+    spi.configure(&opts)?;
 
-	Ok(spi)
+    Ok(spi)
 }
 
 fn set_motors(buttons: &GamepadButtons, small: &mut bool, big: &mut u8) {
@@ -68,32 +63,36 @@ fn main() {
             Err(_) => {
                 print!("\rError reading controller");
                 continue;
-            },
+            }
             Ok(x) => x,
         };
 
         match controller {
             Device::DualShock(x) | Device::AnalogJoystick(x) => {
-                println!("DualShock:   Start? {0} - R:{1:02x},{2:02x}, L:{3:02x},{4:02x}", 
+                println!(
+                    "DualShock:   Start? {0} - R:{1:02x},{2:02x}, L:{3:02x},{4:02x}",
                     x.buttons.start(),
                     x.rx,
                     x.ry,
                     x.lx,
-                    x.ly);
+                    x.ly
+                );
 
                 set_motors(&x.buttons, &mut small, &mut big);
-            },
+            }
             Device::DualShock2(x) => {
-                println!("DualShock2:  Start? {0} - R:{1:02x},{2:02x} - X Pressure:{3:02x}", 
+                println!(
+                    "DualShock2:  Start? {0} - R:{1:02x},{2:02x} - X Pressure:{3:02x}",
                     x.buttons.start(),
                     x.rx,
                     x.ry,
-                    x.pressures[6]);
+                    x.pressures[6]
+                );
 
                 set_motors(&x.buttons, &mut small, &mut big);
-            },
+            }
             Device::None => println!("Please plug in a controller"),
             _ => println!("This example doesn't support the current controller"),
-        } 
+        }
     }
 }
