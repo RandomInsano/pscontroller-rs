@@ -2,8 +2,7 @@ extern crate embedded_hal;
 extern crate linux_embedded_hal as linux_hal;
 extern crate pscontroller_rs;
 
-use linux_hal::gpio_cdev::{Chip, LineHandle, LineRequestFlags};
-use linux_hal::spidev::{SpiModeFlags, Spidev, SpidevOptions};
+use linux_hal::spidev::{SpiModeFlags, SpidevBus, SpidevOptions};
 use std::io;
 use std::{thread, time};
 
@@ -17,8 +16,8 @@ const SPI_SPEED: u32 = 100_000;
 // and pass the pin into psp's new() function.
 //const SPI_ENABLE_PIN: u32 = 4;
 
-fn build_spi() -> io::Result<Spidev> {
-    let mut spi = Spidev::open(SPI_DEVICE)?;
+fn build_spi() -> io::Result<SpidevBus> {
+    let mut spi = SpidevBus::open(SPI_DEVICE)?;
     let opts = SpidevOptions::new()
         .bits_per_word(8)
         .max_speed_hz(SPI_SPEED)
@@ -31,12 +30,13 @@ fn build_spi() -> io::Result<Spidev> {
 
 fn main() {
     let spi = build_spi().unwrap();
+    // Example of using GPIO pin for chip select:
     //const GPIO_CHIP: &str = "/dev/gpiochip0";
     //let mut chip = Chip::new(GPIO_CHIP).unwrap();
-    //let enable_pin = chip.get_line(SPI_ENABLE_PIN).unwrap()
-    //    .request(LineRequestFlags::OUTPUT, 1, "pscontroller").unwrap();
+    //let enable_pin = CdevPin::new(chip.get_line(SPI_ENABLE_PIN).unwrap()
+    //    .request(LineRequestFlags::OUTPUT, 1, "pscontroller").unwrap()).unwrap();
     //let mut psp = PlayStationPort::new(spi, Some(enable_pin));
-    let mut psp = PlayStationPort::new(spi, None::<LineHandle>);
+    let mut psp = PlayStationPort::new(spi, None);
     let mut command = [0u8; 32];
     let mut buffer = [0u8; 32];
 
