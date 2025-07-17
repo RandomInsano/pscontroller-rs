@@ -3,7 +3,7 @@ extern crate linux_embedded_hal as linux_hal;
 extern crate pscontroller_rs;
 
 use linux_hal::spidev::{SpiModeFlags, SpidevOptions};
-use linux_hal::SpidevBus;
+use linux_hal::{CdevPin, SpidevBus};
 use std::io;
 use std::{thread, time};
 
@@ -17,7 +17,7 @@ const SPI_SPEED: u32 = 100_000;
 // and pass the pin into psp's new() function.
 //const SPI_ENABLE_PIN: u32 = 4;
 
-fn build_spi() -> io::Result<SpidevBus> {
+fn build_spi() -> Result<SpidevBus, Box<dyn std::error::Error>> {
     let mut spi = SpidevBus::open(SPI_DEVICE)?;
     let opts = SpidevOptions::new()
         .bits_per_word(8)
@@ -37,7 +37,7 @@ fn main() {
     //let enable_pin = CdevPin::new(chip.get_line(SPI_ENABLE_PIN).unwrap()
     //    .request(LineRequestFlags::OUTPUT, 1, "pscontroller").unwrap()).unwrap();
     //let mut psp = PlayStationPort::new(spi, Some(enable_pin));
-    let mut psp = PlayStationPort::new(spi, None);
+    let mut psp: PlayStationPort<_, CdevPin> = PlayStationPort::new(spi, None);
     let mut command = [0u8; 32];
     let mut buffer = [0u8; 32];
 

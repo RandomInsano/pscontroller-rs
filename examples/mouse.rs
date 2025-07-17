@@ -4,7 +4,7 @@ extern crate pscontroller_rs;
 use std::{io, thread, time};
 
 use linux_hal::spidev::{SpiModeFlags, SpidevOptions};
-use linux_hal::SpidevBus;
+use linux_hal::{CdevPin, SpidevBus};
 
 use pscontroller_rs::{Device, PlayStationPort};
 
@@ -14,7 +14,7 @@ const SPI_DEVICE: &str = "/dev/spidev0.0";
 const SPI_SPEED: u32 = 100_000;
 
 // This will build the
-fn build_spi() -> io::Result<SpidevBus> {
+fn build_spi() -> Result<SpidevBus, Box<dyn std::error::Error>> {
     let mut spi = SpidevBus::open(SPI_DEVICE)?;
     let opts = SpidevOptions::new()
         .bits_per_word(8)
@@ -28,7 +28,7 @@ fn build_spi() -> io::Result<SpidevBus> {
 
 fn main() {
     let spi = build_spi().unwrap();
-    let mut psp = PlayStationPort::new(spi, None);
+    let mut psp: PlayStationPort<_, CdevPin> = PlayStationPort::new(spi, None);
     let sleep_duration = time::Duration::from_millis(10);
 
     let mut x: i32 = 0;
