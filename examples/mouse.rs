@@ -3,7 +3,8 @@ extern crate pscontroller_rs;
 
 use std::{io, thread, time};
 
-use linux_hal::spidev::{SpiModeFlags, SpidevBus, SpidevOptions};
+use linux_hal::spidev::{SpiModeFlags, SpidevOptions};
+use linux_hal::SpidevBus;
 
 use pscontroller_rs::{Device, PlayStationPort};
 
