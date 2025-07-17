@@ -21,4 +21,4 @@ jobs:
         uses: dtolnay/rust-toolchain@stable
 
       - name: Run cargo check
-        run: cargo check --all-features
+        run: cargo check --all-targets --all-features
