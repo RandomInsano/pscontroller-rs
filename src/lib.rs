@@ -67,7 +67,7 @@ extern crate embedded_hal as hal;
 use bit_reverse::ParallelReverse;
 use core::fmt;
 use hal::blocking::spi;
-use hal::digital::OutputPin;
+use hal::digital::v2::OutputPin;
 
 use baton::Baton;
 use classic::{Classic, GamepadButtons};
@@ -295,7 +295,7 @@ where
     pub fn new(spi: SPI, mut select: Option<CS>) -> Self {
         // If a select pin was provided, disable the controller for now
         if let Some(ref mut x) = select {
-            x.set_high();
+            let _ = x.set_high();
         }
 
         Self {
@@ -329,13 +329,13 @@ where
         Self::flip(result);
 
         if let Some(ref mut x) = self.select {
-            x.set_low();
+            let _ = x.set_low();
         }
 
         self.dev.transfer(result)?;
 
         if let Some(ref mut x) = self.select {
-            x.set_high();
+            let _ = x.set_high();
         }
 
         Self::flip(result);
