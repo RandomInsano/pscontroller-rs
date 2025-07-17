@@ -30,12 +30,6 @@ fn build_spi() -> Result<SpidevBus, Box<dyn std::error::Error>> {
 
 fn main() {
     let spi = build_spi().unwrap();
-    // Example of using GPIO pin for chip select:
-    //const GPIO_CHIP: &str = "/dev/gpiochip0";
-    //let mut chip = Chip::new(GPIO_CHIP).unwrap();
-    //let enable_pin = CdevPin::new(chip.get_line(SPI_ENABLE_PIN).unwrap()
-    //    .request(LineRequestFlags::OUTPUT, 1, "pscontroller").unwrap()).unwrap();
-    //let mut psp = PlayStationPort::new(spi, Some(enable_pin));
     let mut psp: PlayStationPort<_, CdevPin> = PlayStationPort::new(spi, None);
     let mut command = [0u8; 32];
     let mut buffer = [0u8; 32];
