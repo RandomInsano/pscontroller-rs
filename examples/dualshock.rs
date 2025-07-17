@@ -2,7 +2,7 @@ extern crate bit_reverse;
 extern crate linux_embedded_hal as linux_hal;
 extern crate pscontroller_rs;
 
-use linux_hal::spidev::{SpidevBus, SpidevOptions, SpiModeFlags};
+use linux_hal::spidev::{SpiModeFlags, SpidevBus, SpidevOptions};
 use std::io;
 
 use pscontroller_rs::{classic::GamepadButtons, dualshock::ControlDS, Device, PlayStationPort};
