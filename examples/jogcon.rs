@@ -11,7 +11,6 @@ extern crate pscontroller_rs;
 
 use linux_hal::spidev::{SpiModeFlags, SpidevOptions};
 use linux_hal::{CdevPin, SpidevBus};
-use std::io;
 
 use pscontroller_rs::{
     jogcon::{ControlJC, JogControl},

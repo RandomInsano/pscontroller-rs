@@ -1,7 +1,7 @@
 extern crate linux_embedded_hal as linux_hal;
 extern crate pscontroller_rs;
 
-use std::{io, thread, time};
+use std::{thread, time};
 
 use linux_hal::spidev::{SpiModeFlags, SpidevOptions};
 use linux_hal::{CdevPin, SpidevBus};
