@@ -500,6 +500,8 @@ where
 }
 
 mod tests {
+    use super::ControllerData;
+    
     #[test]
     fn union_test() {
         // Again, buttons are active low, hence 'fe' and '7f'
