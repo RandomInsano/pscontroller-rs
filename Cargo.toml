@@ -15,10 +15,10 @@ exclude = [
 ]
 
 [dependencies]
-embedded-hal = "0.2.7"
+embedded-hal = "1.0.0"
 bit_reverse = { version = "0.1.7", default-features = false }
 bitflags = "1.0"
 byteorder = { version = "1.2", default-features = false }
 
 [dev-dependencies]
-linux-embedded-hal = "0.2.2"
+linux-embedded-hal = "0.4.0"

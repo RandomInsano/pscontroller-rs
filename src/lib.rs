@@ -66,8 +66,8 @@ extern crate embedded_hal as hal;
 
 use bit_reverse::ParallelReverse;
 use core::fmt;
-use hal::blocking::spi;
-use hal::digital::v2::OutputPin;
+use hal::digital::OutputPin;
+use hal::spi::SpiBus;
 
 use baton::Baton;
 use classic::{Classic, GamepadButtons};
@@ -285,9 +285,9 @@ pub struct PlayStationPort<SPI, CS> {
     multitap_port: MultitapPort,
 }
 
-impl<E, SPI, CS> PlayStationPort<SPI, CS>
+impl<SPI, CS> PlayStationPort<SPI, CS>
 where
-    SPI: spi::Transfer<u8, Error = E>,
+    SPI: SpiBus,
     CS: OutputPin,
 {
     /// Create a new device to talk over the PlayStation's controller
@@ -319,7 +319,7 @@ where
     }
 
     /// Sends commands to the underlying hardware and provides responses
-    pub fn send_command(&mut self, command: &[u8], result: &mut [u8]) -> Result<(), E> {
+    pub fn send_command(&mut self, command: &[u8], result: &mut [u8]) -> Result<(), SPI::Error> {
         // Pack in bytes for the command we'll be sending
         result[..command.len()].copy_from_slice(command);
         result[0] = self.multitap_port.clone() as u8;
@@ -332,7 +332,7 @@ where
             let _ = x.set_low();
         }
 
-        self.dev.transfer(result)?;
+        self.dev.transfer_in_place(result)?;
 
         if let Some(ref mut x) = self.select {
             let _ = x.set_high();
@@ -345,7 +345,7 @@ where
 
     /// Configure the controller to set it to DualShock2 mode. This will also
     /// enable analog mode on DualShock1 controllers.
-    pub fn enable_pressure(&mut self) -> Result<(), E> {
+    pub fn enable_pressure(&mut self) -> Result<(), SPI::Error> {
         // TODO: Redefine this to allow input parameters. Right now they're are hard coded
         // TODO: Detect and return actual protocol errors
 
@@ -370,7 +370,7 @@ where
     /// JogCon will go to sleep until buttons are pressed. If no polling is
     /// done for 10 seconds, it will drop out of this mode and revert to
     /// the standard Controller mode
-    pub fn enable_jogcon(&mut self) -> Result<(), E> {
+    pub fn enable_jogcon(&mut self) -> Result<(), SPI::Error> {
         let mut buffer = [0u8; MESSAGE_MAX_LENGTH];
 
         // Wake up the controller if needed
@@ -386,7 +386,7 @@ where
 
     /// Read various parameters from the controller including its current
     /// status.
-    pub fn read_config(&mut self) -> Result<ControllerConfiguration, E> {
+    pub fn read_config(&mut self) -> Result<ControllerConfiguration, SPI::Error> {
         let mut config: ControllerConfiguration = Default::default();
         let mut buffer = [0u8; MESSAGE_MAX_LENGTH];
 
@@ -418,7 +418,7 @@ where
     fn read_port(
         &mut self,
         command: Option<&dyn PollCommand>,
-    ) -> Result<[u8; MESSAGE_MAX_LENGTH], Error<E>> {
+    ) -> Result<[u8; MESSAGE_MAX_LENGTH], Error<SPI::Error>> {
         let mut buffer = [0u8; MESSAGE_MAX_LENGTH];
         let mut data = [0u8; MESSAGE_MAX_LENGTH];
 
@@ -453,7 +453,7 @@ where
     pub fn read_raw(
         &mut self,
         command: Option<&dyn PollCommand>,
-    ) -> Result<ControllerData, Error<E>> {
+    ) -> Result<ControllerData, Error<SPI::Error>> {
         let mut buffer = [0u8; MESSAGE_MAX_LENGTH];
         let data = self.read_port(command)?;
 
@@ -468,7 +468,10 @@ where
 
     /// Ask the controller for input states. Different contoller types will be returned automatically
     /// for you. If you'd like to cooerce a controller yourself, use `read_raw`.
-    pub fn read_input(&mut self, command: Option<&dyn PollCommand>) -> Result<Device, Error<E>> {
+    pub fn read_input(
+        &mut self,
+        command: Option<&dyn PollCommand>,
+    ) -> Result<Device, Error<SPI::Error>> {
         let mut buffer = [0u8; MESSAGE_MAX_LENGTH];
         let data = self.read_port(command)?;
 
