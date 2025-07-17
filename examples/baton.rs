@@ -2,9 +2,8 @@ extern crate bit_reverse;
 extern crate linux_embedded_hal as linux_hal;
 extern crate pscontroller_rs;
 
-use linux_hal::spidev::{SpidevOptions, SPI_MODE_3};
-use linux_hal::Pin;
-use linux_hal::Spidev;
+use linux_hal::gpio_cdev::{Chip, LineHandle, LineRequestFlags};
+use linux_hal::spidev::{SpiModeFlags, Spidev, SpidevOptions};
 use std::io;
 
 use pscontroller_rs::PlayStationPort;
@@ -20,7 +19,7 @@ fn build_spi() -> io::Result<Spidev> {
     let opts = SpidevOptions::new()
         .bits_per_word(8)
         .max_speed_hz(SPI_SPEED)
-        .mode(SPI_MODE_3)
+        .mode(SpiModeFlags::SPI_MODE_3)
         .build();
     spi.configure(&opts)?;
 
@@ -29,7 +28,7 @@ fn build_spi() -> io::Result<Spidev> {
 
 fn main() {
     let spi = build_spi().unwrap();
-    let mut psp = PlayStationPort::new(spi, None::<Pin>);
+    let mut psp = PlayStationPort::new(spi, None::<LineHandle>);
 
     let mut controller;
 
