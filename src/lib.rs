@@ -502,6 +502,7 @@ where
 #[cfg(test)]
 mod tests {
     use super::ControllerData;
+    use super::MESSAGE_MAX_LENGTH;
 
     #[test]
     fn union_test() {
