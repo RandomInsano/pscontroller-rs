@@ -5,8 +5,6 @@
 //! are represented and you can send them with square, triangle,
 //! circle, left, up, and right.
 
-#![feature(duration_from_micros)]
-
 extern crate embedded_hal;
 extern crate linux_embedded_hal as linux_hal;
 extern crate pscontroller_rs;
@@ -56,7 +54,7 @@ fn main() {
 
         // We only care about the JogCon here so skip everything else
         let jogcon = match controller {
-            Device::JogCon(x) => (x),
+            Device::JogCon(x) => x,
             _ => continue,
         };
 

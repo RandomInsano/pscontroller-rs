@@ -499,13 +499,22 @@ where
     }
 }
 
+#[cfg(test)]
 mod tests {
+    use super::ControllerData;
+    use super::MESSAGE_MAX_LENGTH;
+
     #[test]
     fn union_test() {
         // Again, buttons are active low, hence 'fe' and '7f'
-        let controller = ControllerData {
-            data: [0xfe, 0x7f, 0x00, 0x00, 0x00, 0xff],
-        };
+        let mut data = [0u8; MESSAGE_MAX_LENGTH];
+        data[0] = 0xfe;
+        data[1] = 0x7f;
+        data[2] = 0x00;
+        data[3] = 0x00;
+        data[4] = 0x00;
+        data[5] = 0xff;
+        let controller = ControllerData { data };
 
         unsafe {
             assert!(controller.ds.buttons.select() == true);
