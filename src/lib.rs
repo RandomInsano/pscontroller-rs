@@ -506,7 +506,7 @@ mod tests {
     #[test]
     fn union_test() {
         // Again, buttons are active low, hence 'fe' and '7f'
-        let mut data = [0u8; 32];
+        let mut data = [0u8; MESSAGE_MAX_LENGTH];
         data[0] = 0xfe;
         data[1] = 0x7f;
         data[2] = 0x00;
